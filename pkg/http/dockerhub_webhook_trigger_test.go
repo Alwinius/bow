@@ -30,7 +30,7 @@ var fakeRequest = `{
 		"star_count": 0,
 		"comment_count": 0,
 		"date_created": 1497032538,
-		"dockerfile": "FROM golang:1.8.1-alpine\nCOPY . /go/src/github.com/keel-hq/keel\nWORKDIR /go/src/github.com/keel-hq/keel\nRUN apk add --no-cache git && go get\nRUN CGO_ENABLED=0 GOOS=linux go build -a -tags netgo -ldflags -'w' -o keel .\n\nFROM alpine:latest\nRUN apk --no-cache add ca-certificates\nCOPY --from=0 /go/src/github.com/keel-hq/keel/keel /bin/keel\nENTRYPOINT [\"/bin/keel\"]\n\nEXPOSE 9300",
+		"dockerfile": "FROM golang:1.8.1-alpine\nCOPY . /go/src/github.com/alwinius/keel\nWORKDIR /go/src/github.com/alwinius/keel\nRUN apk add --no-cache git && go get\nRUN CGO_ENABLED=0 GOOS=linux go build -a -tags netgo -ldflags -'w' -o keel .\n\nFROM alpine:latest\nRUN apk --no-cache add ca-certificates\nCOPY --from=0 /go/src/github.com/alwinius/keel/keel /bin/keel\nENTRYPOINT [\"/bin/keel\"]\n\nEXPOSE 9300",
 		"repo_name": "karolisr/keel"
 	}
 }`

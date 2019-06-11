@@ -3,11 +3,11 @@ package kubernetes
 import (
 	"testing"
 
-	"github.com/keel-hq/keel/approvals"
-	"github.com/keel-hq/keel/cache/memory"
-	"github.com/keel-hq/keel/extension/notification"
-	"github.com/keel-hq/keel/internal/k8s"
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/approvals"
+	"github.com/alwinius/keel/cache/memory"
+	"github.com/alwinius/keel/extension/notification"
+	"github.com/alwinius/keel/internal/k8s"
+	"github.com/alwinius/keel/types"
 
 	apps_v1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -816,7 +816,7 @@ func TestEventSentWithReleaseNotes(t *testing.T) {
 				Name:        "deployment-1",
 				Namespace:   "xxxx",
 				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
-				Annotations: map[string]string{types.KeelReleaseNotesURL: "https://github.com/keel-hq/keel/releases"},
+				Annotations: map[string]string{types.KeelReleaseNotesURL: "https://github.com/alwinius/keel/releases"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -858,8 +858,8 @@ func TestEventSentWithReleaseNotes(t *testing.T) {
 		t.Errorf("expected to find a deployment with updated image but found: %s", fp.updated.Containers()[0].Image)
 	}
 
-	if fs.sentEvent.Message != "Successfully updated deployment xxxx/deployment-1 10.0.0->11.0.0 (gcr.io/v2-namespace/hello-world:11.0.0). Release notes: https://github.com/keel-hq/keel/releases" {
-		t.Errorf("expected 'Successfully updated deployment xxxx/deployment-1 10.0.0->11.0.0 (gcr.io/v2-namespace/hello-world:11.0.0). Release notes: https://github.com/keel-hq/keel/releases' sent message, got: %s", fs.sentEvent.Message)
+	if fs.sentEvent.Message != "Successfully updated deployment xxxx/deployment-1 10.0.0->11.0.0 (gcr.io/v2-namespace/hello-world:11.0.0). Release notes: https://github.com/alwinius/keel/releases" {
+		t.Errorf("expected 'Successfully updated deployment xxxx/deployment-1 10.0.0->11.0.0 (gcr.io/v2-namespace/hello-world:11.0.0). Release notes: https://github.com/alwinius/keel/releases' sent message, got: %s", fs.sentEvent.Message)
 	}
 }
 

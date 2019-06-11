@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/image"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/image"
 
 	"k8s.io/helm/pkg/chartutil"
 
@@ -48,10 +48,6 @@ func getImages(vals chartutil.Values) ([]*types.TrackedImage, error) {
 			PollSchedule: keelCfg.PollSchedule,
 			Trigger:      keelCfg.Trigger,
 			Policy:       keelCfg.Plc,
-		}
-
-		if imageDetails.ImagePullSecret != "" {
-			trackedImage.Secrets = append(trackedImage.Secrets, imageDetails.ImagePullSecret)
 		}
 
 		images = append(images, trackedImage)

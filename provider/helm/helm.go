@@ -6,16 +6,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/keel-hq/keel/approvals"
-	"github.com/keel-hq/keel/internal/policy"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/image"
+	"github.com/alwinius/keel/approvals"
+	"github.com/alwinius/keel/internal/policy"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/image"
 
 	hapi_chart "k8s.io/helm/pkg/proto/hapi/chart"
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/keel-hq/keel/extension/notification"
+	"github.com/alwinius/keel/extension/notification"
 
 	"github.com/ghodss/yaml"
 	log "github.com/sirupsen/logrus"
@@ -219,7 +219,6 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 				"selector":      selector,
 				"helm.sh/chart": fmt.Sprintf("%s-%s", release.Chart.Metadata.Name, release.Chart.Metadata.Version),
 			}
-			img.Namespace = release.Namespace
 			img.Provider = ProviderName
 			trackedImages = append(trackedImages, img)
 		}

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/alwinius/keel/types"
 	"github.com/google/uuid"
-	"github.com/keel-hq/keel/types"
 )
 
 // CreateAuditLog - create new audit log entry

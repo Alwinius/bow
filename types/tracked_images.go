@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	"github.com/keel-hq/keel/util/image"
+	"github.com/alwinius/keel/util/image"
 )
 
 // Credentials - registry credentials
@@ -17,8 +17,6 @@ type TrackedImage struct {
 	Trigger      TriggerType       `json:"trigger"`
 	PollSchedule string            `json:"pollSchedule"`
 	Provider     string            `json:"provider"`
-	Namespace    string            `json:"namespace"`
-	Secrets      []string          `json:"secrets"`
 	Meta         map[string]string `json:"meta"` // metadata supplied by providers
 	// a list of pre-release tags, ie: 1.0.0-dev, 1.5.0-prod get translated into
 	// dev, prod
@@ -33,5 +31,5 @@ type Policy interface {
 }
 
 func (i TrackedImage) String() string {
-	return fmt.Sprintf("namespace:%s,image:%s:%s,provider:%s,trigger:%s,sched:%s,secrets:%s", i.Namespace, i.Image.Repository(), i.Image.Tag(), i.Provider, i.Trigger, i.PollSchedule, i.Secrets)
+	return fmt.Sprintf("image:%s:%s,provider:%s,trigger:%s,sched:%s", i.Image.Repository(), i.Image.Tag(), i.Provider, i.Trigger, i.PollSchedule)
 }

@@ -10,10 +10,10 @@ import (
 
 	"github.com/nlopes/slack"
 
-	"github.com/keel-hq/keel/constants"
-	"github.com/keel-hq/keel/extension/notification"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/version"
+	"github.com/alwinius/keel/constants"
+	"github.com/alwinius/keel/extension/notification"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/version"
 
 	log "github.com/sirupsen/logrus"
 )

@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/types"
 )
 
 func Test_getPolicyFromLabels(t *testing.T) {

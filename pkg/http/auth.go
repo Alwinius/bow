@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/alwinius/keel/pkg/auth"
 	request "github.com/dgrijalva/jwt-go/request"
-	"github.com/keel-hq/keel/pkg/auth"
 	log "github.com/sirupsen/logrus"
 )
 

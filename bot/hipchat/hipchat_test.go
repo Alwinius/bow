@@ -9,13 +9,13 @@ import (
 
 	h "github.com/daneharrigan/hipchat"
 
-	"github.com/keel-hq/keel/approvals"
-	b "github.com/keel-hq/keel/bot"
-	"github.com/keel-hq/keel/cache/memory"
-	"github.com/keel-hq/keel/provider/kubernetes"
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/approvals"
+	b "github.com/alwinius/keel/bot"
+	"github.com/alwinius/keel/cache/memory"
+	"github.com/alwinius/keel/provider/kubernetes"
+	"github.com/alwinius/keel/types"
 
-	testutil "github.com/keel-hq/keel/util/testing"
+	testutil "github.com/alwinius/keel/util/testing"
 
 	log "github.com/sirupsen/logrus"
 )

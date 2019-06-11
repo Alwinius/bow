@@ -10,11 +10,11 @@ keywords:
 - continuous deployment
 home: https://keel.sh
 sources:
-- https://github.com/keel-hq/keel
+- https://github.com/alwinius/keel
 maintainers:
 - name: rimusz
   email: rmocius@gmail.com
 - name: rusenask
   email: karolis.rusenas@gmail.com
 engine: gotpl
-icon: https://raw.githubusercontent.com/keel-hq/keel/master/static/keel-logo.png
+icon: https://raw.githubusercontent.com/alwinius/keel/master/static/keel-logo.png

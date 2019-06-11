@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/stopper"
-	"github.com/keel-hq/keel/util/timeutil"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/stopper"
+	"github.com/alwinius/keel/util/timeutil"
 
 	log "github.com/sirupsen/logrus"
 )

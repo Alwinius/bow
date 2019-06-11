@@ -3,12 +3,12 @@ package poll
 import (
 	"sort"
 
-	"github.com/keel-hq/keel/extension/credentialshelper"
-	"github.com/keel-hq/keel/internal/policy"
-	"github.com/keel-hq/keel/provider"
-	"github.com/keel-hq/keel/registry"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/version"
+	"github.com/alwinius/keel/extension/credentialshelper"
+	"github.com/alwinius/keel/internal/policy"
+	"github.com/alwinius/keel/provider"
+	"github.com/alwinius/keel/registry"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/version"
 
 	"github.com/prometheus/client_golang/prometheus"
 

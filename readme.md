@@ -8,8 +8,8 @@
     <img src="https://circleci.com/gh/keel-hq/keel/tree/master.svg?style=shield&circle-token=0239846a42cfa188de531058b9a2116a4b8600d8" alt="CircleCI">
   </a>
   
-  <a href="https://goreportcard.com/report/github.com/keel-hq/keel">
-    <img src="https://goreportcard.com/badge/github.com/keel-hq/keel" alt="Go Report">
+  <a href="https://goreportcard.com/report/github.com/alwinius/keel">
+    <img src="https://goreportcard.com/badge/github.com/alwinius/keel" alt="Go Report">
   </a>
   
   <a href="https://img.shields.io/docker/pulls/keelhq/keel.svg">
@@ -115,7 +115,7 @@ If you work mostly with regular Kubernetes manifests, you can install Keel witho
 helm upgrade --install keel --namespace=keel keel/keel --set helmProvider.enabled="false" 
 ```
 
-That's it, see [Configuration](https://github.com/keel-hq/keel#configuration) section now.
+That's it, see [Configuration](https://github.com/alwinius/keel#configuration) section now.
 
 ### Quick Start
 
@@ -146,7 +146,7 @@ Documentation is viewable on the Keel Website:
 
 ### Contributing
 
-Before starting to work on some big or medium features - raise an issue [here](https://github.com/keel-hq/keel/issues) so we can coordinate our efforts.
+Before starting to work on some big or medium features - raise an issue [here](https://github.com/alwinius/keel/issues) so we can coordinate our efforts.
 
 ### Developing Keel
 

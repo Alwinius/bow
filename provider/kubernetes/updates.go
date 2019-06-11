@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/keel-hq/keel/internal/k8s"
-	"github.com/keel-hq/keel/internal/policy"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/image"
+	"github.com/alwinius/keel/internal/k8s"
+	"github.com/alwinius/keel/internal/policy"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/image"
 
 	log "github.com/sirupsen/logrus"
 )

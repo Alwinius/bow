@@ -3,9 +3,9 @@ GIT_REVISION	= $(shell git rev-parse --short HEAD)
 VERSION		?= $(shell git describe --tags --abbrev=0)
 
 LDFLAGS		+= -linkmode external -extldflags -static
-LDFLAGS		+= -X github.com/keel-hq/keel/version.Version=$(VERSION)
-LDFLAGS		+= -X github.com/keel-hq/keel/version.Revision=$(GIT_REVISION)
-LDFLAGS		+= -X github.com/keel-hq/keel/version.BuildDate=$(JOBDATE)
+LDFLAGS		+= -X github.com/alwinius/keel/version.Version=$(VERSION)
+LDFLAGS		+= -X github.com/alwinius/keel/version.Revision=$(GIT_REVISION)
+LDFLAGS		+= -X github.com/alwinius/keel/version.BuildDate=$(JOBDATE)
 
 .PHONY: release
 
@@ -53,8 +53,8 @@ build:
 
 install:
 	@echo "++ Installing keel"
-	# CGO_ENABLED=0 GOOS=linux go install -ldflags "$(LDFLAGS)" github.com/keel-hq/keel/cmd/keel	
-	GOOS=linux go install -ldflags "$(LDFLAGS)" github.com/keel-hq/keel/cmd/keel	
+	# CGO_ENABLED=0 GOOS=linux go install -ldflags "$(LDFLAGS)" github.com/alwinius/keel/cmd/keel
+	GOOS=linux go install -ldflags "$(LDFLAGS)" github.com/alwinius/keel/cmd/keel
 
 image:
 	docker build -t keelhq/keel:alpha -f Dockerfile .

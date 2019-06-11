@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/types"
 )
 
 type resourcePolicyUpdateRequest struct {

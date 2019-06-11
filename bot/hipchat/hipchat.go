@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/keel-hq/keel/bot"
-	"github.com/keel-hq/keel/constants"
+	"github.com/alwinius/keel/bot"
+	"github.com/alwinius/keel/constants"
 
-	log "github.com/sirupsen/logrus"
 	h "github.com/daneharrigan/hipchat"
+	log "github.com/sirupsen/logrus"
 )
 
 const connectionAttemptsDefault = 5

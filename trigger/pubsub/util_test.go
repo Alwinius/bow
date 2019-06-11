@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/keel-hq/keel/util/image"
+	"github.com/alwinius/keel/util/image"
 )
 
 func unsafeImageRef(img string) *image.Reference {

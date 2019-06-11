@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/keel-hq/keel/approvals"
-	"github.com/keel-hq/keel/pkg/auth"
-	"github.com/keel-hq/keel/provider"
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/approvals"
+	"github.com/alwinius/keel/pkg/auth"
+	"github.com/alwinius/keel/provider"
+	"github.com/alwinius/keel/types"
 )
 
 func TestListApprovals(t *testing.T) {

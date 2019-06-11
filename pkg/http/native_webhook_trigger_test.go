@@ -8,12 +8,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/keel-hq/keel/approvals"
-	"github.com/keel-hq/keel/provider"
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/approvals"
+	"github.com/alwinius/keel/provider"
+	"github.com/alwinius/keel/types"
 
-	"github.com/keel-hq/keel/pkg/auth"
-	"github.com/keel-hq/keel/pkg/store/sql"
+	"github.com/alwinius/keel/pkg/auth"
+	"github.com/alwinius/keel/pkg/store/sql"
 
 	"net/http/httptest"
 	"testing"

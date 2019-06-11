@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/keel-hq/keel/approvals"
-	"github.com/keel-hq/keel/cache/memory"
-	"github.com/keel-hq/keel/internal/policy"
-	"github.com/keel-hq/keel/provider"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/image"
+	"github.com/alwinius/keel/approvals"
+	"github.com/alwinius/keel/cache/memory"
+	"github.com/alwinius/keel/internal/policy"
+	"github.com/alwinius/keel/provider"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/image"
 )
 
 func TestWatchMultipleTagsWithSemver(t *testing.T) {

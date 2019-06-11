@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/alwinius/keel/internal/gitrepo"
+	"github.com/alwinius/keel/provider/git"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -11,44 +13,41 @@ import (
 	netContext "golang.org/x/net/context"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/keel-hq/keel/approvals"
-	"github.com/keel-hq/keel/bot"
+	"github.com/alwinius/keel/approvals"
+	"github.com/alwinius/keel/bot"
 
-	// "github.com/keel-hq/keel/cache/memory"
-	"github.com/keel-hq/keel/pkg/auth"
-	"github.com/keel-hq/keel/pkg/http"
-	"github.com/keel-hq/keel/pkg/store"
-	"github.com/keel-hq/keel/pkg/store/sql"
+	// "github.com/alwinius/keel/cache/memory"
+	"github.com/alwinius/keel/pkg/auth"
+	"github.com/alwinius/keel/pkg/http"
+	"github.com/alwinius/keel/pkg/store"
+	"github.com/alwinius/keel/pkg/store/sql"
 
-	"github.com/keel-hq/keel/constants"
-	"github.com/keel-hq/keel/extension/credentialshelper"
-	"github.com/keel-hq/keel/extension/notification"
-	"github.com/keel-hq/keel/internal/k8s"
-	"github.com/keel-hq/keel/internal/workgroup"
-	"github.com/keel-hq/keel/provider"
-	"github.com/keel-hq/keel/provider/helm"
-	"github.com/keel-hq/keel/provider/kubernetes"
-	"github.com/keel-hq/keel/registry"
-	"github.com/keel-hq/keel/secrets"
-	"github.com/keel-hq/keel/trigger/poll"
-	"github.com/keel-hq/keel/trigger/pubsub"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/version"
+	"github.com/alwinius/keel/constants"
+	"github.com/alwinius/keel/extension/notification"
+	"github.com/alwinius/keel/internal/k8s"
+	"github.com/alwinius/keel/internal/workgroup"
+	"github.com/alwinius/keel/provider"
+	"github.com/alwinius/keel/provider/helm"
+	"github.com/alwinius/keel/provider/kubernetes"
+	"github.com/alwinius/keel/registry"
+	"github.com/alwinius/keel/trigger/poll"
+	"github.com/alwinius/keel/trigger/pubsub"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/version"
 
 	// notification extensions
-	"github.com/keel-hq/keel/extension/notification/auditor"
-	_ "github.com/keel-hq/keel/extension/notification/hipchat"
-	_ "github.com/keel-hq/keel/extension/notification/mattermost"
-	_ "github.com/keel-hq/keel/extension/notification/slack"
-	_ "github.com/keel-hq/keel/extension/notification/webhook"
+	"github.com/alwinius/keel/extension/notification/auditor"
+	_ "github.com/alwinius/keel/extension/notification/hipchat"
+	_ "github.com/alwinius/keel/extension/notification/mattermost"
+	_ "github.com/alwinius/keel/extension/notification/slack"
+	_ "github.com/alwinius/keel/extension/notification/webhook"
 
 	// credentials helpers
-	_ "github.com/keel-hq/keel/extension/credentialshelper/aws"
-	secretsCredentialsHelper "github.com/keel-hq/keel/extension/credentialshelper/secrets"
+	_ "github.com/alwinius/keel/extension/credentialshelper/aws"
 
 	// bots
-	_ "github.com/keel-hq/keel/bot/hipchat"
-	_ "github.com/keel-hq/keel/bot/slack"
+	_ "github.com/alwinius/keel/bot/hipchat"
+	_ "github.com/alwinius/keel/bot/slack"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -101,7 +100,7 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	dataDir := "/data"
+	dataDir := "/home/alwin"
 	if os.Getenv(EnvDataDir) != "" {
 		dataDir = os.Getenv(EnvDataDir)
 	}
@@ -182,9 +181,12 @@ func main() {
 	buf := k8s.NewBuffer(&g, t, log.StandardLogger(), 128)
 	wl := log.WithField("context", "watch")
 	k8s.WatchDeployments(&g, implementer.Client(), wl, buf)
-	k8s.WatchStatefulSets(&g, implementer.Client(), wl, buf)
-	k8s.WatchDaemonSets(&g, implementer.Client(), wl, buf)
-	k8s.WatchCronJobs(&g, implementer.Client(), wl, buf)
+
+	gitrepo.WatchRepo(&g, implementer.Client(), wl, buf)
+
+	//k8s.WatchStatefulSets(&g, implementer.Client(), wl, buf)
+	//k8s.WatchDaemonSets(&g, implementer.Client(), wl, buf)
+	//k8s.WatchCronJobs(&g, implementer.Client(), wl, buf)
 
 	// approvalsCache := memory.NewMemoryCache()
 	approvalsManager := approvals.New(&approvals.Opts{
@@ -204,20 +206,20 @@ func main() {
 	})
 
 	// registering secrets based credentials helper
-	dockerConfig := make(secrets.DockerCfg)
-	if os.Getenv(EnvDefaultDockerRegistryCfg) != "" {
-		dockerConfigStr := os.Getenv(EnvDefaultDockerRegistryCfg)
-		dockerConfig, err = secrets.DecodeDockerCfgJson([]byte(dockerConfigStr))
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err,
-			}).Fatalf("failed to decode secret provided in %s env variable", EnvDefaultDockerRegistryCfg)
-		}
-	}
-	secretsGetter := secrets.NewGetter(implementer, dockerConfig)
-
-	ch := secretsCredentialsHelper.New(secretsGetter)
-	credentialshelper.RegisterCredentialsHelper("secrets", ch)
+	//dockerConfig := make(secrets.DockerCfg)
+	//if os.Getenv(EnvDefaultDockerRegistryCfg) != "" {
+	//	dockerConfigStr := os.Getenv(EnvDefaultDockerRegistryCfg)
+	//	dockerConfig, err = secrets.DecodeDockerCfgJson([]byte(dockerConfigStr))
+	//	if err != nil {
+	//		log.WithFields(log.Fields{
+	//			"error": err,
+	//		}).Fatalf("failed to decode secret provided in %s env variable", EnvDefaultDockerRegistryCfg)
+	//	}
+	//}
+	//secretsGetter := secrets.NewGetter(implementer, dockerConfig)
+	//
+	//ch := secretsCredentialsHelper.New(secretsGetter)
+	//credentialshelper.RegisterCredentialsHelper("secrets", ch)
 
 	// trigger setup
 	// teardownTriggers := setupTriggers(ctx, providers, approvalsManager, &t.GenericResourceCache, implementer)
@@ -274,22 +276,38 @@ type ProviderOpts struct {
 func setupProviders(opts *ProviderOpts) (providers provider.Providers) {
 	var enabledProviders []provider.Provider
 
-	k8sProvider, err := kubernetes.NewProvider(opts.k8sImplementer, opts.sender, opts.approvalsManager, opts.grc)
+	gitProvider, err := git.NewProvider(opts.sender, opts.approvalsManager, opts.grc)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
-		}).Fatal("main.setupProviders: failed to create kubernetes provider")
+		}).Fatal("main.setupProviders: failed to create git provider")
 	}
 	go func() {
-		err := k8sProvider.Start()
+		err := gitProvider.Start()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Fatal("kubernetes provider stopped with an error")
+			}).Fatal("git provider stopped with an error")
 		}
 	}()
+	enabledProviders = append(enabledProviders, gitProvider)
 
-	enabledProviders = append(enabledProviders, k8sProvider)
+	//k8sProvider, err := kubernetes.NewProvider(opts.k8sImplementer, opts.sender, opts.approvalsManager, opts.grc)
+	//if err != nil {
+	//	log.WithFields(log.Fields{
+	//		"error": err,
+	//	}).Fatal("main.setupProviders: failed to create kubernetes provider")
+	//}
+	//go func() {
+	//	err := k8sProvider.Start()
+	//	if err != nil {
+	//		log.WithFields(log.Fields{
+	//			"error": err,
+	//		}).Fatal("kubernetes provider stopped with an error")
+	//	}
+	//}()
+
+	//enabledProviders = append(enabledProviders, k8sProvider)
 
 	if os.Getenv(EnvHelmProvider) == "1" {
 		tillerAddr := os.Getenv(EnvHelmTillerAddress)

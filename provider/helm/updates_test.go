@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/keel-hq/keel/internal/policy"
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/internal/policy"
+	"github.com/alwinius/keel/types"
 	hapi_chart "k8s.io/helm/pkg/proto/hapi/chart"
 )
 
@@ -42,7 +42,7 @@ keel:
   images:
     - repository: image.repository
       tag: image.tag
-      releaseNotes: https://github.com/keel-hq/keel/releases
+      releaseNotes: https://github.com/alwinius/keel/releases
 
 `
 
@@ -137,7 +137,7 @@ keel:
 				Values:         map[string]string{"image.tag": "1.2.0"},
 				CurrentVersion: "1.1.0",
 				NewVersion:     "1.2.0",
-				ReleaseNotes:   []string{"https://github.com/keel-hq/keel/releases"},
+				ReleaseNotes:   []string{"https://github.com/alwinius/keel/releases"},
 				Config: &KeelChartConfig{
 					Policy:  "force",
 					Trigger: types.TriggerTypePoll,
@@ -145,7 +145,7 @@ keel:
 						ImageDetails{
 							RepositoryPath: "image.repository",
 							TagPath:        "image.tag",
-							ReleaseNotes:   "https://github.com/keel-hq/keel/releases",
+							ReleaseNotes:   "https://github.com/alwinius/keel/releases",
 						},
 					},
 					Plc: policy.NewForcePolicy(false),

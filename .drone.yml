@@ -3,7 +3,7 @@ name: default
 
 workspace:
   base: /go
-  path: src/github.com/keel-hq/keel
+  path: src/github.com/alwinius/keel
 
 steps:
 - name: unit-test

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/alwinius/keel/types"
 	"github.com/jinzhu/gorm"
-	"github.com/keel-hq/keel/types"
 
 	// importing sqlite driver
 	_ "github.com/jinzhu/gorm/dialects/sqlite"

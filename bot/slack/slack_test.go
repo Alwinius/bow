@@ -7,18 +7,18 @@ import (
 
 	"github.com/nlopes/slack"
 
-	"github.com/keel-hq/keel/extension/approval"
-	"github.com/keel-hq/keel/provider/kubernetes"
+	"github.com/alwinius/keel/extension/approval"
+	"github.com/alwinius/keel/provider/kubernetes"
 
-	"github.com/keel-hq/keel/approvals"
-	b "github.com/keel-hq/keel/bot"
-	"github.com/keel-hq/keel/cache/memory"
-	"github.com/keel-hq/keel/constants"
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/approvals"
+	b "github.com/alwinius/keel/bot"
+	"github.com/alwinius/keel/cache/memory"
+	"github.com/alwinius/keel/constants"
+	"github.com/alwinius/keel/types"
 
 	"testing"
 
-	testutil "github.com/keel-hq/keel/util/testing"
+	testutil "github.com/alwinius/keel/util/testing"
 )
 
 var botMessagesChannel chan *b.BotMessage

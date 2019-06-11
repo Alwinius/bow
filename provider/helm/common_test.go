@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/keel-hq/keel/internal/policy"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/image"
+	"github.com/alwinius/keel/internal/policy"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/image"
 	"k8s.io/helm/pkg/chartutil"
 )
 

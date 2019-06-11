@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/keel-hq/keel/internal/k8s"
-	"github.com/keel-hq/keel/internal/policy"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/timeutil"
+	"github.com/alwinius/keel/internal/k8s"
+	"github.com/alwinius/keel/internal/policy"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/timeutil"
 
 	apps_v1 "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"

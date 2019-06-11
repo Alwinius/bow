@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/types"
 )
 
 type trackedImage struct {
@@ -30,7 +30,6 @@ func (s *TriggerServer) trackedHandler(resp http.ResponseWriter, req *http.Reque
 			Trigger:      img.Trigger.String(),
 			PollSchedule: img.PollSchedule,
 			Provider:     img.Provider,
-			Namespace:    img.Namespace,
 			Policy:       img.Policy.Name(),
 			Registry:     img.Image.Registry(),
 		})

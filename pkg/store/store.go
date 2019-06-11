@@ -3,7 +3,7 @@ package store
 import (
 	"errors"
 
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/types"
 )
 
 type Store interface {

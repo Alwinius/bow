@@ -3,7 +3,7 @@ package slack
 import (
 	"fmt"
 
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/types"
 	"github.com/nlopes/slack"
 )
 

@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/types"
 )
 
 func TestGetVersionFromImageName(t *testing.T) {

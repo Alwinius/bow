@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/keel-hq/keel/internal/k8s"
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/internal/k8s"
+	"github.com/alwinius/keel/types"
 
 	apps_v1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"

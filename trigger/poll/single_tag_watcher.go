@@ -1,10 +1,10 @@
 package poll
 
 import (
-	"github.com/keel-hq/keel/extension/credentialshelper"
-	"github.com/keel-hq/keel/provider"
-	"github.com/keel-hq/keel/registry"
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/extension/credentialshelper"
+	"github.com/alwinius/keel/provider"
+	"github.com/alwinius/keel/registry"
+	"github.com/alwinius/keel/types"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 )

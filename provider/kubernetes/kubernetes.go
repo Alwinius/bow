@@ -13,13 +13,13 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/keel-hq/keel/approvals"
-	"github.com/keel-hq/keel/extension/notification"
-	"github.com/keel-hq/keel/internal/k8s"
-	"github.com/keel-hq/keel/internal/policy"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/image"
-	"github.com/keel-hq/keel/util/policies"
+	"github.com/alwinius/keel/approvals"
+	"github.com/alwinius/keel/extension/notification"
+	"github.com/alwinius/keel/internal/k8s"
+	"github.com/alwinius/keel/internal/policy"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/keel/util/policies"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -184,7 +184,6 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 		if specifiedSecret != "" {
 			secrets = append(secrets, specifiedSecret)
 		}
-		secrets = append(secrets, gr.GetImagePullSecrets()...)
 
 		images := gr.GetImages()
 		for _, img := range images {
@@ -212,8 +211,6 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 				PollSchedule: schedule,
 				Trigger:      trigger,
 				Provider:     ProviderName,
-				Namespace:    gr.Namespace,
-				Secrets:      secrets,
 				Meta:         make(map[string]string),
 				Policy:       plc,
 			})

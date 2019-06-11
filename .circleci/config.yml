@@ -12,7 +12,7 @@ jobs:
     #### expecting it in the form of
     ####   /go/src/github.com/circleci/go-tool
     ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/keel-hq/keel
+    working_directory: /go/src/github.com/alwinius/keel
     steps:
       - checkout
 
@@ -40,7 +40,7 @@ jobs:
       - run:
           name: lint
           command: |
-            git remote add k8s https://github.com/keel-hq/keel
+            git remote add k8s https://github.com/alwinius/keel
             git fetch k8s master
             ct lint --config .test/ct.yaml
   install-charts:
@@ -48,7 +48,7 @@ jobs:
     environment:
       CHART_TESTING_IMAGE: quay.io/helmpack/chart-testing
       CHART_TESTING_TAG: v2.0.1
-      CHARTS_REPO: https://github.com/keel-hq/keel
+      CHARTS_REPO: https://github.com/alwinius/keel
       K8S_VERSION: v1.11.3
     steps:
       - checkout

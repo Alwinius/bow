@@ -6,12 +6,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/keel-hq/keel/extension/credentialshelper"
-	"github.com/keel-hq/keel/provider"
-	"github.com/keel-hq/keel/registry"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/image"
-	"github.com/keel-hq/keel/util/version"
+	"github.com/alwinius/keel/extension/credentialshelper"
+	"github.com/alwinius/keel/provider"
+	"github.com/alwinius/keel/registry"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/keel/util/version"
 	"github.com/rusenask/cron"
 
 	"github.com/prometheus/client_golang/prometheus"

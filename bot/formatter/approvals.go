@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/types"
 )
 
 // Formatter headers
@@ -90,4 +90,3 @@ func (c *ApprovalContext) Created() string {
 	c.AddHeader(ApprovalCreatedHeader)
 	return c.v.CreatedAt.String()
 }
-

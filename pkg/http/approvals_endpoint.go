@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/keel-hq/keel/pkg/store"
-	"github.com/keel-hq/keel/types"
+	"github.com/alwinius/keel/pkg/store"
+	"github.com/alwinius/keel/types"
 )
 
 type approveRequest struct {

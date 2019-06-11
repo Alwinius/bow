@@ -19,9 +19,9 @@ func registryMatches(imageRegistry, secretRegistry string) bool {
 	}
 
 	// checking domains only
-	if domainOnly(imageRegistry) == domainOnly(secretRegistry) {
-		return true
-	}
+	//if domainOnly(imageRegistry) == domainOnly(secretRegistry) {
+	//	return true
+	//}
 
 	// stripping any paths
 	irh, err := url.Parse("https://" + imageRegistry)
