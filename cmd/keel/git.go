@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/alwinius/keel/provider/helm"
 	"gopkg.in/src-d/go-git.v4"
-	. "gopkg.in/src-d/go-git.v4/_examples"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 )
 
@@ -18,7 +17,7 @@ func main() {
 
 	// Clones the given repository, creating the remote, the local branches
 	// and fetching the objects, everything in memory:
-	Info("git clone")
+	fmt.Println("git clone")
 
 	var r *git.Repository
 	var err error
@@ -30,19 +29,17 @@ func main() {
 	}
 
 	// Gets the HEAD history from HEAD, just like this command:
-	Info("git log")
+	fmt.Println("git log")
 
 	// ... retrieves the branch pointed by HEAD
 	ref, err := r.Head()
-	CheckIfError(err)
 
 	// ... retrieving the commit object
 	commit, err := r.CommitObject(ref.Hash())
-	CheckIfError(err)
 	fmt.Println(commit)
 
 	// List the tree from HEAD
-	Info("git ls-tree -r HEAD")
+	fmt.Println("git ls-tree -r HEAD")
 
 	//// ... retrieve the tree from the commit
 	//tree, err := commit.Tree()
@@ -54,5 +51,8 @@ func main() {
 	//	return nil
 	//})
 
-	_ = helm.Run("./")
+	err = helm.ProcessTemplate("./helm/petclinic/")
+	if err != nil {
+		fmt.Println(err)
+	}
 }

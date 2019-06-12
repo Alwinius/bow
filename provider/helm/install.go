@@ -1,5 +1,5 @@
 /*
-Copyright The Helm Authors.
+Copyright 2016 The Kubernetes Authors All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,10 +29,16 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/ghodss/yaml"
+	"k8s.io/helm/pkg/chartutil"
 	"k8s.io/helm/pkg/downloader"
 	"k8s.io/helm/pkg/getter"
-	"k8s.io/helm/pkg/kube"
+	helm_env "k8s.io/helm/pkg/helm/environment"
+	"k8s.io/helm/pkg/proto/hapi/chart"
 	"k8s.io/helm/pkg/repo"
+)
+
+var (
+	settings helm_env.EnvSettings
 )
 
 type valueFiles []string
@@ -64,6 +70,11 @@ func mergeValues(dest map[string]interface{}, src map[string]interface{}) map[st
 		// If it isn't another map, overwrite the value
 		if !ok {
 			dest[k] = v
+			continue
+		}
+		// If the key doesn't exist already, then just set the key to that value
+		if _, exists := dest[k]; !exists {
+			dest[k] = nextMap
 			continue
 		}
 		// Edge case: If the key exists in the destination, but isn't a map
@@ -154,8 +165,6 @@ func locateChartPath(repoURL, username, password, name, version string, verify b
 		Out:      os.Stdout,
 		Keyring:  keyring,
 		Getters:  getter.All(settings),
-		Username: username,
-		Password: password,
 	}
 	if verify {
 		dl.Verify = downloader.VerifyAlways
@@ -180,8 +189,6 @@ func locateChartPath(repoURL, username, password, name, version string, verify b
 			return filename, err
 		}
 		return lname, nil
-	} else if settings.Debug {
-		return filename, err
 	}
 
 	return filename, fmt.Errorf("failed to download %q (hint: running `helm repo update` may help)", name)
@@ -201,10 +208,30 @@ func generateName(nameTemplate string) (string, error) {
 }
 
 func defaultNamespace() string {
-	if ns, _, err := kube.GetConfig(settings.KubeContext, settings.KubeConfig).Namespace(); err == nil {
-		return ns
-	}
 	return "default"
+}
+
+func checkDependencies(ch *chart.Chart, reqs *chartutil.Requirements) error {
+	missing := []string{}
+
+	deps := ch.GetDependencies()
+	for _, r := range reqs.Dependencies {
+		found := false
+		for _, d := range deps {
+			if d.Metadata.Name == r.Name {
+				found = true
+				break
+			}
+		}
+		if !found {
+			missing = append(missing, r.Name)
+		}
+	}
+
+	if len(missing) > 0 {
+		return fmt.Errorf("found in requirements.yaml, but missing in charts/ directory: %s", strings.Join(missing, ", "))
+	}
+	return nil
 }
 
 //readFile load a file from the local directory or a remote file with a url.

@@ -1,3 +1,19 @@
+/*
+Copyright 2016 The Kubernetes Authors All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package helm
 
 import (
@@ -5,32 +21,29 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/helm/pkg/chartutil"
 	"k8s.io/helm/pkg/manifest"
-	"k8s.io/helm/pkg/proto/hapi/chart"
 	"k8s.io/helm/pkg/renderutil"
-	"k8s.io/helm/pkg/tiller"
-	"k8s.io/helm/pkg/timeconv"
 	"os"
 	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"k8s.io/helm/pkg/proto/hapi/chart"
+	//"k8s.io/helm/pkg/tiller"
+	"k8s.io/helm/pkg/timeconv"
 )
 
 const defaultDirectoryPermission = 0755
 
-var (
-	whitespaceRegex = regexp.MustCompile(`^\s*$`)
+var whitespaceRegex = regexp.MustCompile(`^\s*$`)
+var defaultKubeVersion = fmt.Sprintf("%s.%s", chartutil.DefaultKubeVersion.Major, chartutil.DefaultKubeVersion.Minor)
 
-	// defaultKubeVersion is the default value of --kube-version flag
-	defaultKubeVersion = fmt.Sprintf("%s.%s", chartutil.DefaultKubeVersion.Major, chartutil.DefaultKubeVersion.Minor)
-)
-
-func Run(path string) error {
+func ProcessTemplate(path string) error {
 	//args[0] is chartPath
 	chartPath, _ := filepath.Abs(path)
 	var outputDir string
 	var namespace string
-	var vFiles = valueFiles{"values.yml"}
+	var vFiles = valueFiles{path + "/values.yaml"}
 	releaseName := "whatever"
 
 	// verify that output-dir exists if provided
@@ -44,6 +57,9 @@ func Run(path string) error {
 	if namespace == "" {
 		namespace = "default"
 	}
+
+	fmt.Println("the chartpath is ", chartPath)
+
 	// get combined values and create config
 	rawVals, err := vals(vFiles, "", "", "")
 	if err != nil {
@@ -58,7 +74,7 @@ func Run(path string) error {
 	// Check chart requirements to make sure all dependencies are present in /charts
 	c, err := chartutil.Load(chartPath)
 	if err != nil {
-		return prettyError(err)
+		return err
 	}
 
 	renderOpts := renderutil.Options{
@@ -80,10 +96,12 @@ func Run(path string) error {
 	listManifests := manifest.SplitManifests(renderedTemplates)
 	var manifestsToRender []manifest.Manifest
 
+	fmt.Println("we have", len(listManifests), "manifests")
+
 	// render all manifests in the chart
 	manifestsToRender = listManifests
 
-	for _, m := range tiller.SortByKind(manifestsToRender) {
+	for _, m := range SortByKind(manifestsToRender) {
 		data := m.Content
 		b := filepath.Base(m.Name)
 		if b == "NOTES.txt" {
