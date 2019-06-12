@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	apps_v1 "k8s.io/api/apps/v1"
+	v1beta1 "k8s.io/api/batch/v1beta1"
 	"k8s.io/api/core/v1"
 
 	"k8s.io/apimachinery/pkg/fields"

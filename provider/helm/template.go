@@ -38,7 +38,7 @@ const defaultDirectoryPermission = 0755
 var whitespaceRegex = regexp.MustCompile(`^\s*$`)
 var defaultKubeVersion = fmt.Sprintf("%s.%s", chartutil.DefaultKubeVersion.Major, chartutil.DefaultKubeVersion.Minor)
 
-func ProcessTemplate(path string) error {
+func ProcessTemplate(path string) ([]manifest.Manifest, error) {
 	//args[0] is chartPath
 	chartPath, _ := filepath.Abs(path)
 	var outputDir string
@@ -50,7 +50,7 @@ func ProcessTemplate(path string) error {
 	if outputDir != "" {
 		_, err := os.Stat(outputDir)
 		if os.IsNotExist(err) {
-			return fmt.Errorf("output-dir '%s' does not exist", outputDir)
+			return nil, fmt.Errorf("output-dir '%s' does not exist", outputDir)
 		}
 	}
 
@@ -63,18 +63,18 @@ func ProcessTemplate(path string) error {
 	// get combined values and create config
 	rawVals, err := vals(vFiles, "", "", "")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	config := &chart.Config{Raw: string(rawVals), Values: map[string]*chart.Value{}}
 
 	if msgs := validation.IsDNS1123Subdomain(releaseName); releaseName != "" && len(msgs) > 0 {
-		return fmt.Errorf("release name %s is invalid: %s", releaseName, strings.Join(msgs, ";"))
+		return nil, fmt.Errorf("release name %s is invalid: %s", releaseName, strings.Join(msgs, ";"))
 	}
 
 	// Check chart requirements to make sure all dependencies are present in /charts
 	c, err := chartutil.Load(chartPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	renderOpts := renderutil.Options{
@@ -90,7 +90,7 @@ func ProcessTemplate(path string) error {
 
 	renderedTemplates, err := renderutil.Render(c, config, renderOpts)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	listManifests := manifest.SplitManifests(renderedTemplates)
@@ -118,14 +118,17 @@ func ProcessTemplate(path string) error {
 			}
 			err = writeToFile(outputDir, m.Name, data)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			continue
 		}
-		fmt.Printf("---\n# Source: %s\n", m.Name)
-		fmt.Println(data)
+		//fmt.Printf("---\n# Source: %s\n", m.Name)
+		//fmt.Println(data)
+
+		//this is where we have to turn the manifest into a GenericResource of Kind Deployment or StatefulSet and put it into the cache
+
 	}
-	return nil
+	return manifestsToRender, nil
 }
 
 // write the <data> to <output-dir>/<name>

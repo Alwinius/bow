@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/alwinius/keel/provider/helm"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 )
@@ -51,8 +50,8 @@ func main() {
 	//	return nil
 	//})
 
-	err = helm.ProcessTemplate("./helm/petclinic/")
-	if err != nil {
-		fmt.Println(err)
-	}
+	//err = helm.ProcessTemplate("./helm/petclinic/")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
 }

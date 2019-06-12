@@ -1,35 +1,61 @@
 package gitrepo
 
 import (
+	"fmt"
 	"github.com/alwinius/keel/internal/workgroup"
+	"github.com/alwinius/keel/provider/helm"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 	apps_v1 "k8s.io/api/apps/v1"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/helm/pkg/manifest"
+	"path/filepath"
+	"regexp"
 	"time"
 )
 
 func WatchRepo(g *workgroup.Group, client *kubernetes.Clientset, log logrus.FieldLogger, rs ...cache.ResourceEventHandler) {
 
-	// we have to turn this upside down - let's start with something like `git clone ...`
+	// here we retrieve the deployments from git and store k8s objects in a cache, this doesnt have to run often
 
 	watch(g, client.AppsV1().RESTClient(), log, "deployments", new(apps_v1.Deployment), rs...)
 }
 
 func watch(g *workgroup.Group, c cache.Getter, log logrus.FieldLogger, resource string, objType runtime.Object, rs ...cache.ResourceEventHandler) {
-	lw := cache.NewListWatchFromClient(c, resource, v1.NamespaceAll, fields.Everything())
-	sw := cache.NewSharedInformer(lw, objType, 30*time.Minute)
-	for _, r := range rs {
-		sw.AddEventHandler(r)
-	}
+
+	// TODO: use parameters, use cache
+
 	g.Add(func(stop <-chan struct{}) {
 		log := log.WithField("resource", resource)
 		log.Println("started")
 		defer log.Println("stopped")
-		sw.Run(stop)
+		for  {
+				path, _ := filepath.Abs("/home/alwin/projects/keel-tmp")
+				url := "https://iteragit.iteratec.de/bachelors-thesis-aeb/petclinic-deployment.git"
+				chartFolder := "/helm/petclinic/"
+				finalManifests := cloneOrUpdateGit(path,url , , chartFolder)
+
+				var properResources []runtime.Object
+				for _, m := range finalManifests {
+					if gr, err := yamlToGenericResource(m.Content); err == nil {
+						properResources = append(properResources, gr)
+					} else {
+						log.Error(err)
+					}
+				}
+
+				for _, r := range properResources {
+					for _, reh := range rs {
+						reh.OnAdd(r)
+					}
+				}
+				time.Sleep(time.Second * 5)
+
+		}
 	})
 }
 
@@ -105,4 +131,45 @@ func (b *buffer) send(ev interface{}) {
 		b.Printf("event channel is full, len: %v, cap: %v", len(b.ev), cap(b.ev))
 		b.ev <- ev
 	}
+}
+
+func cloneOrUpdateGit(path string, url string, username string, password string, chartFolder string) []manifest.Manifest {
+	var r *git.Repository
+	var err error
+	if r, err = git.PlainOpen(path); err != nil {
+		r, err = git.PlainClone(path, false, &git.CloneOptions{
+			Auth: &http.BasicAuth{
+				Username: username,
+				Password: password,
+			},
+			URL: url,
+		})
+	}
+	ref, err := r.Head()
+	commit, err := r.CommitObject(ref.Hash())
+	fmt.Println("last commit", commit.Message)
+
+	finalManifests, err := helm.ProcessTemplate(path + chartFolder)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return finalManifests
+
+}
+
+func yamlToGenericResource(r string) (runtime.Object, error) {
+	acceptedK8sTypes := regexp.MustCompile(`(Deployment|StatefulSet|Cronjob)`) // TODO: fill properly or remove
+	decode := scheme.Codecs.UniversalDeserializer().Decode
+	obj, groupVersionKind, err := decode([]byte(r), nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	if !acceptedK8sTypes.MatchString(groupVersionKind.Kind) {
+		return nil, fmt.Errorf("skipping object with type: %s", groupVersionKind.Kind)
+	} else {
+		return obj, nil
+	}
+
+
 }
