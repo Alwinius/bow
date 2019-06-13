@@ -88,16 +88,16 @@ func (r *GenericResource) DeepCopy() *GenericResource {
 
 // GetIdentifier returns resource identifier
 func (r *GenericResource) GetIdentifier() string {
-	//switch obj := r.obj.(type) {
-	//case *apps_v1.Deployment:
-	//	return getDeploymentIdentifier(obj)
-	////case *apps_v1.StatefulSet:
-	////	return getStatefulSetIdentifier(obj)
-	////case *apps_v1.DaemonSet:
-	////	return getDaemonsetSetIdentifier(obj)
-	////case *v1beta1.CronJob:
-	////	return getCronJobIdentifier(obj)
-	//}
+	switch obj := r.obj.(type) {
+	case *apps_v1.Deployment:
+		return getDeploymentIdentifier(obj)
+	case *apps_v1.StatefulSet:
+		return getStatefulSetIdentifier(obj)
+	case *apps_v1.DaemonSet:
+		return getDaemonsetSetIdentifier(obj)
+	case *v1beta1.CronJob:
+		return getCronJobIdentifier(obj)
+	}
 	return ""
 }
 
@@ -245,18 +245,33 @@ func (r *GenericResource) SetAnnotations(annotations map[string]string) {
 	}
 }
 
+// GetImagePullSecrets - returns secrets from pod spec
+func (r *GenericResource) GetImagePullSecrets() (secrets []string) {
+	switch obj := r.obj.(type) {
+	case *apps_v1.Deployment:
+		return getImagePullSecrets(obj.Spec.Template.Spec.ImagePullSecrets)
+	case *apps_v1.StatefulSet:
+		return getImagePullSecrets(obj.Spec.Template.Spec.ImagePullSecrets)
+	case *apps_v1.DaemonSet:
+		return getImagePullSecrets(obj.Spec.Template.Spec.ImagePullSecrets)
+	case *v1beta1.CronJob:
+		return getImagePullSecrets(obj.Spec.JobTemplate.Spec.Template.Spec.ImagePullSecrets)
+	}
+	return
+}
+
 // GetImages - returns images used by this resource
 func (r *GenericResource) GetImages() (images []string) {
-	//switch obj := r.obj.(type) {
-	//case *apps_v1.Deployment:
-	//	return getContainerImages(obj.Spec.Template.Spec.Containers)
-	//case *apps_v1.StatefulSet:
-	//	return getContainerImages(obj.Spec.Template.Spec.Containers)
-	//case *apps_v1.DaemonSet:
-	//	return getContainerImages(obj.Spec.Template.Spec.Containers)
-	//case *v1beta1.CronJob:
-	//	return getContainerImages(obj.Spec.JobTemplate.Spec.Template.Spec.Containers)
-	//}
+	switch obj := r.obj.(type) {
+	case *apps_v1.Deployment:
+		return getContainerImages(obj.Spec.Template.Spec.Containers)
+	case *apps_v1.StatefulSet:
+		return getContainerImages(obj.Spec.Template.Spec.Containers)
+	case *apps_v1.DaemonSet:
+		return getContainerImages(obj.Spec.Template.Spec.Containers)
+	case *v1beta1.CronJob:
+		return getContainerImages(obj.Spec.JobTemplate.Spec.Template.Spec.Containers)
+	}
 	return
 }
 

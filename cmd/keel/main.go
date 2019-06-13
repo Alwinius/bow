@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/alwinius/keel/internal/gitrepo"
-	"github.com/alwinius/keel/provider/git"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -11,7 +10,7 @@ import (
 	"context"
 
 	netContext "golang.org/x/net/context"
-	kingpin "gopkg.in/alecthomas/kingpin.v2"
+	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/alwinius/keel/approvals"
 	"github.com/alwinius/keel/bot"
@@ -180,7 +179,7 @@ func main() {
 
 	buf := k8s.NewBuffer(&g, t, log.StandardLogger(), 128)
 	wl := log.WithField("context", "watch")
-	k8s.WatchDeployments(&g, implementer.Client(), wl, buf)
+	//k8s.WatchDeployments(&g, implementer.Client(), wl, buf)
 
 	gitrepo.WatchRepo(&g, implementer.Client(), wl, buf)
 
@@ -276,38 +275,22 @@ type ProviderOpts struct {
 func setupProviders(opts *ProviderOpts) (providers provider.Providers) {
 	var enabledProviders []provider.Provider
 
-	gitProvider, err := git.NewProvider(opts.sender, opts.approvalsManager, opts.grc)
+	k8sProvider, err := kubernetes.NewProvider(opts.k8sImplementer, opts.sender, opts.approvalsManager, opts.grc)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
-		}).Fatal("main.setupProviders: failed to create git provider")
+		}).Fatal("main.setupProviders: failed to create kubernetes provider")
 	}
 	go func() {
-		err := gitProvider.Start()
+		err := k8sProvider.Start()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Fatal("git provider stopped with an error")
+			}).Fatal("kubernetes provider stopped with an error")
 		}
 	}()
-	enabledProviders = append(enabledProviders, gitProvider)
 
-	//k8sProvider, err := kubernetes.NewProvider(opts.k8sImplementer, opts.sender, opts.approvalsManager, opts.grc)
-	//if err != nil {
-	//	log.WithFields(log.Fields{
-	//		"error": err,
-	//	}).Fatal("main.setupProviders: failed to create kubernetes provider")
-	//}
-	//go func() {
-	//	err := k8sProvider.Start()
-	//	if err != nil {
-	//		log.WithFields(log.Fields{
-	//			"error": err,
-	//		}).Fatal("kubernetes provider stopped with an error")
-	//	}
-	//}()
-
-	//enabledProviders = append(enabledProviders, k8sProvider)
+	enabledProviders = append(enabledProviders, k8sProvider)
 
 	if os.Getenv(EnvHelmProvider) == "1" {
 		tillerAddr := os.Getenv(EnvHelmTillerAddress)

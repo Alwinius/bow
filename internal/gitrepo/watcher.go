@@ -20,40 +20,38 @@ import (
 
 func WatchRepo(g *workgroup.Group, client *kubernetes.Clientset, log logrus.FieldLogger, rs ...cache.ResourceEventHandler) {
 
-	// here we retrieve the deployments from git and store k8s objects in a cache, this doesnt have to run often
-
 	watch(g, client.AppsV1().RESTClient(), log, "deployments", new(apps_v1.Deployment), rs...)
 }
 
 func watch(g *workgroup.Group, c cache.Getter, log logrus.FieldLogger, resource string, objType runtime.Object, rs ...cache.ResourceEventHandler) {
 
-	// TODO: use parameters, use cache
+	// TODO: use parameters, use cache, dont just add every time
 
 	g.Add(func(stop <-chan struct{}) {
 		log := log.WithField("resource", resource)
 		log.Println("started")
 		defer log.Println("stopped")
-		for  {
-				path, _ := filepath.Abs("/home/alwin/projects/keel-tmp")
-				url := "https://iteragit.iteratec.de/bachelors-thesis-aeb/petclinic-deployment.git"
-				chartFolder := "/helm/petclinic/"
-				finalManifests := cloneOrUpdateGit(path,url , , chartFolder)
+		for {
+			path, _ := filepath.Abs("/home/alwin/projects/keel-tmp")
+			url := "https://iteragit.iteratec.de/bachelors-thesis-aeb/petclinic-deployment.git"
+			chartFolder := "/helm/petclinic/"
+			finalManifests := cloneOrUpdateGit(path, url, "gitlab+deploy-token-17", "LyEiqszgP8ssssRTTVMB", chartFolder)
 
-				var properResources []runtime.Object
-				for _, m := range finalManifests {
-					if gr, err := yamlToGenericResource(m.Content); err == nil {
-						properResources = append(properResources, gr)
-					} else {
-						log.Error(err)
-					}
+			var properResources []runtime.Object
+			for _, m := range finalManifests {
+				if gr, err := yamlToGenericResource(m.Content); err == nil {
+					properResources = append(properResources, gr)
+				} else {
+					log.Error(err)
 				}
+			}
 
-				for _, r := range properResources {
-					for _, reh := range rs {
-						reh.OnAdd(r)
-					}
+			for _, r := range properResources {
+				for _, reh := range rs {
+					reh.OnAdd(r)
 				}
-				time.Sleep(time.Second * 5)
+			}
+			time.Sleep(time.Second * 30)
 
 		}
 	})
@@ -170,6 +168,5 @@ func yamlToGenericResource(r string) (runtime.Object, error) {
 	} else {
 		return obj, nil
 	}
-
 
 }

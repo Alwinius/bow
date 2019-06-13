@@ -36,7 +36,7 @@ const KeelForceTagMatchLabel = "keel.sh/matchTag"
 const KeelPollScheduleAnnotation = "keel.sh/pollSchedule"
 
 // KeelPollDefaultSchedule - defaul polling schedule
-const KeelPollDefaultSchedule = "@every 1m"
+const KeelPollDefaultSchedule = "@every 5m"
 
 // KeelDigestAnnotation - digest annotation
 const KeelDigestAnnotation = "keel.sh/digest"

@@ -19,5 +19,5 @@ func GetTriggerPolicy(labels map[string]string, annotations map[string]string) t
 		return types.ParseTrigger(trigger)
 	}
 
-	return types.TriggerTypeDefault
+	return types.TriggerTypePoll
 }

@@ -152,12 +152,12 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 	for _, gr := range p.cache.Values() {
 		labels := gr.GetLabels()
 		annotations := gr.GetAnnotations()
-
-		// ignoring unlabelled deployments
-		plc := policy.GetPolicyFromLabelsOrAnnotations(labels, annotations)
-		if plc.Type() == policy.PolicyTypeNone {
-			continue
-		}
+		// by default we want to track every deployment, not just specifically labeled (for now)
+		// NOT ignoring unlabelled deployments
+		//plc := policy.GetPolicyFromLabelsOrAnnotations(labels, annotations)
+		//if plc.Type() == policy.PolicyTypeNone {
+		//	continue
+		//}
 
 		schedule, ok := annotations[types.KeelPollScheduleAnnotation]
 		if ok {
@@ -216,7 +216,6 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 			})
 		}
 	}
-
 	return trackedImages, nil
 }
 
@@ -240,6 +239,10 @@ func (p *Provider) startInternal() error {
 }
 
 func (p *Provider) processEvent(event *types.Event) (updated []*k8s.GenericResource, err error) {
+
+	fmt.Println("Someone told us, that", event.Repository.Name, "got a new tag", event.Repository.Tag)
+	fmt.Println("Now we need to find out where this needs to be added and then commit the new files")
+
 	plans, err := p.createUpdatePlans(&event.Repository)
 	if err != nil {
 		return nil, err
