@@ -7,9 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
-	apps_v1 "k8s.io/api/apps/v1"
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/helm/pkg/manifest"
@@ -18,31 +17,31 @@ import (
 	"time"
 )
 
-func WatchRepo(g *workgroup.Group, client *kubernetes.Clientset, log logrus.FieldLogger, rs ...cache.ResourceEventHandler) {
+const repoPath = "/home/alwin/projects/keel-tmp/"
 
-	watch(g, client.AppsV1().RESTClient(), log, "deployments", new(apps_v1.Deployment), rs...)
+func WatchRepo(g *workgroup.Group, repo Repo, log logrus.FieldLogger, rs ...cache.ResourceEventHandler) {
+
+	watch(g, repo, log, "deployments", new(appsv1.Deployment), rs...)
 }
 
-func watch(g *workgroup.Group, c cache.Getter, log logrus.FieldLogger, resource string, objType runtime.Object, rs ...cache.ResourceEventHandler) {
+func watch(g *workgroup.Group, repo Repo, log logrus.FieldLogger, resource string, objType runtime.Object, rs ...cache.ResourceEventHandler) {
 
-	// TODO: use parameters, use cache, dont just add every time
+	// TODO: use cache, dont just add every time
 
 	g.Add(func(stop <-chan struct{}) {
 		log := log.WithField("resource", resource)
 		log.Println("started")
 		defer log.Println("stopped")
 		for {
-			path, _ := filepath.Abs("/home/alwin/projects/keel-tmp")
-			url := "https://iteragit.iteratec.de/bachelors-thesis-aeb/petclinic-deployment.git"
-			chartFolder := "/helm/petclinic/"
-			finalManifests := cloneOrUpdateGit(path, url, "gitlab+deploy-token-17", "LyEiqszgP8ssssRTTVMB", chartFolder)
+			path, _ := filepath.Abs(repoPath)
+			finalManifests := cloneOrUpdateGit(path, repo.URL, repo.Username, repo.Password, repo.ChartPath)
 
 			var properResources []runtime.Object
 			for _, m := range finalManifests {
 				if gr, err := yamlToGenericResource(m.Content); err == nil {
 					properResources = append(properResources, gr)
 				} else {
-					log.Error(err)
+					log.Debug(err)
 				}
 			}
 
@@ -135,6 +134,7 @@ func cloneOrUpdateGit(path string, url string, username string, password string,
 	var r *git.Repository
 	var err error
 	if r, err = git.PlainOpen(path); err != nil {
+		logrus.Debug(err)
 		r, err = git.PlainClone(path, false, &git.CloneOptions{
 			Auth: &http.BasicAuth{
 				Username: username,
@@ -142,12 +142,22 @@ func cloneOrUpdateGit(path string, url string, username string, password string,
 			},
 			URL: url,
 		})
+	} else {
+		w, _ := r.Worktree()
+		err = w.Pull(&git.PullOptions{RemoteName: "origin",
+			Auth: &http.BasicAuth{
+				Username: username,
+				Password: password,
+			}})
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 	ref, err := r.Head()
 	commit, err := r.CommitObject(ref.Hash())
-	fmt.Println("last commit", commit.Message)
+	fmt.Println("last commit:", commit.Message)
 
-	finalManifests, err := helm.ProcessTemplate(path + chartFolder)
+	finalManifests, err := helm.ProcessTemplate(path + "/" + chartFolder) // because of filepath.abs path is always without /
 	if err != nil {
 		fmt.Println(err)
 	}

@@ -61,6 +61,10 @@ const (
 	EnvHelmProvider      = "HELM_PROVIDER"  // helm provider
 	EnvHelmTillerAddress = "TILLER_ADDRESS" // helm provider
 	EnvUIDir             = "UI_DIR"
+	EnvRepoURL           = "REPO_URL"
+	EnvRepoUser          = "REPO_USERNAME"   // optional
+	EnvRepoPassword      = "REPO_PASSWORD"   // optional
+	EnvRepoChartPath     = "REPO_CHART_PATH" // optional
 
 	// EnvDefaultDockerRegistryCfg - default registry configuration that can be passed into
 	// keel for polling trigger
@@ -179,13 +183,9 @@ func main() {
 
 	buf := k8s.NewBuffer(&g, t, log.StandardLogger(), 128)
 	wl := log.WithField("context", "watch")
-	//k8s.WatchDeployments(&g, implementer.Client(), wl, buf)
 
-	gitrepo.WatchRepo(&g, implementer.Client(), wl, buf)
-
-	//k8s.WatchStatefulSets(&g, implementer.Client(), wl, buf)
-	//k8s.WatchDaemonSets(&g, implementer.Client(), wl, buf)
-	//k8s.WatchCronJobs(&g, implementer.Client(), wl, buf)
+	repo := gitrepo.Repo{Username: os.Getenv(EnvRepoUser), Password: os.Getenv(EnvRepoPassword), URL: os.Getenv(EnvRepoURL), ChartPath: os.Getenv(EnvRepoChartPath)}
+	gitrepo.WatchRepo(&g, repo, wl, buf)
 
 	// approvalsCache := memory.NewMemoryCache()
 	approvalsManager := approvals.New(&approvals.Opts{

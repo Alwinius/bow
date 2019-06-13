@@ -154,7 +154,7 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 		annotations := gr.GetAnnotations()
 		// by default we want to track every deployment, not just specifically labeled (for now)
 		// NOT ignoring unlabelled deployments
-		//plc := policy.GetPolicyFromLabelsOrAnnotations(labels, annotations)
+		plc := policy.GetPolicyFromLabelsOrAnnotations(labels, annotations)
 		//if plc.Type() == policy.PolicyTypeNone {
 		//	continue
 		//}
