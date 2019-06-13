@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/alwinius/keel/extension/credentialshelper"
 	"github.com/alwinius/keel/internal/gitrepo"
+	"github.com/alwinius/keel/secrets"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -43,6 +45,7 @@ import (
 
 	// credentials helpers
 	_ "github.com/alwinius/keel/extension/credentialshelper/aws"
+	secretsCredentialsHelper "github.com/alwinius/keel/extension/credentialshelper/secrets"
 
 	// bots
 	_ "github.com/alwinius/keel/bot/hipchat"
@@ -205,20 +208,20 @@ func main() {
 	})
 
 	// registering secrets based credentials helper
-	//dockerConfig := make(secrets.DockerCfg)
-	//if os.Getenv(EnvDefaultDockerRegistryCfg) != "" {
-	//	dockerConfigStr := os.Getenv(EnvDefaultDockerRegistryCfg)
-	//	dockerConfig, err = secrets.DecodeDockerCfgJson([]byte(dockerConfigStr))
-	//	if err != nil {
-	//		log.WithFields(log.Fields{
-	//			"error": err,
-	//		}).Fatalf("failed to decode secret provided in %s env variable", EnvDefaultDockerRegistryCfg)
-	//	}
-	//}
-	//secretsGetter := secrets.NewGetter(implementer, dockerConfig)
-	//
-	//ch := secretsCredentialsHelper.New(secretsGetter)
-	//credentialshelper.RegisterCredentialsHelper("secrets", ch)
+	dockerConfig := make(secrets.DockerCfg)
+	if os.Getenv(EnvDefaultDockerRegistryCfg) != "" {
+		dockerConfigStr := os.Getenv(EnvDefaultDockerRegistryCfg)
+		dockerConfig, err = secrets.DecodeDockerCfgJson([]byte(dockerConfigStr))
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error": err,
+			}).Fatalf("failed to decode secret provided in %s env variable", EnvDefaultDockerRegistryCfg)
+		}
+	}
+	secretsGetter := secrets.NewGetter(implementer, dockerConfig)
+
+	ch := secretsCredentialsHelper.New(secretsGetter)
+	credentialshelper.RegisterCredentialsHelper("secrets", ch)
 
 	// trigger setup
 	// teardownTriggers := setupTriggers(ctx, providers, approvalsManager, &t.GenericResourceCache, implementer)

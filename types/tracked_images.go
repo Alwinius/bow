@@ -17,6 +17,8 @@ type TrackedImage struct {
 	Trigger      TriggerType       `json:"trigger"`
 	PollSchedule string            `json:"pollSchedule"`
 	Provider     string            `json:"provider"`
+	Namespace    string            `json:"namespace"`
+	Secrets      []string          `json:"secrets"`
 	Meta         map[string]string `json:"meta"` // metadata supplied by providers
 	// a list of pre-release tags, ie: 1.0.0-dev, 1.5.0-prod get translated into
 	// dev, prod
