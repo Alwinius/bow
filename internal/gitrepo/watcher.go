@@ -3,15 +3,10 @@ package gitrepo
 import (
 	"fmt"
 	"github.com/alwinius/keel/internal/workgroup"
-	"github.com/alwinius/keel/provider/helm"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
-	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/helm/pkg/manifest"
 	"path/filepath"
 	"regexp"
 	"time"
@@ -21,20 +16,19 @@ const repoPath = "/home/alwin/projects/keel-tmp/"
 
 func WatchRepo(g *workgroup.Group, repo Repo, log logrus.FieldLogger, rs ...cache.ResourceEventHandler) {
 
-	watch(g, repo, log, "deployments", new(appsv1.Deployment), rs...)
+	watch(g, repo, log, rs...)
 }
 
-func watch(g *workgroup.Group, repo Repo, log logrus.FieldLogger, resource string, objType runtime.Object, rs ...cache.ResourceEventHandler) {
+func watch(g *workgroup.Group, repo Repo, log logrus.FieldLogger, rs ...cache.ResourceEventHandler) {
 
-	// TODO: use cache, dont just add every time
+	// TODO: use cache, dont just add every time or evaluate if this is necessary
 
 	g.Add(func(stop <-chan struct{}) {
-		log := log.WithField("resource", resource)
 		log.Println("started")
 		defer log.Println("stopped")
 		for {
 			path, _ := filepath.Abs(repoPath)
-			finalManifests := cloneOrUpdateGit(path, repo.URL, repo.Username, repo.Password, repo.ChartPath)
+			finalManifests := repo.cloneOrUpdate(path)
 
 			var properResources []runtime.Object
 			for _, m := range finalManifests {
@@ -128,42 +122,6 @@ func (b *buffer) send(ev interface{}) {
 		b.Printf("event channel is full, len: %v, cap: %v", len(b.ev), cap(b.ev))
 		b.ev <- ev
 	}
-}
-
-func cloneOrUpdateGit(path string, url string, username string, password string, chartFolder string) []manifest.Manifest {
-	var r *git.Repository
-	var err error
-	if r, err = git.PlainOpen(path); err != nil {
-		logrus.Debug(err)
-		r, err = git.PlainClone(path, false, &git.CloneOptions{
-			Auth: &http.BasicAuth{
-				Username: username,
-				Password: password,
-			},
-			URL: url,
-		})
-	} else {
-		w, _ := r.Worktree()
-		err = w.Pull(&git.PullOptions{RemoteName: "origin",
-			Auth: &http.BasicAuth{
-				Username: username,
-				Password: password,
-			}})
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-	ref, err := r.Head()
-	commit, err := r.CommitObject(ref.Hash())
-	fmt.Println("last commit:", commit.Message)
-
-	finalManifests, err := helm.ProcessTemplate(path + "/" + chartFolder) // because of filepath.abs path is always without /
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return finalManifests
-
 }
 
 func yamlToGenericResource(r string) (runtime.Object, error) {

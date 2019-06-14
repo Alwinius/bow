@@ -55,9 +55,9 @@ func NewGetter(implementer kubernetes.Implementer, defaultDockerConfig DockerCfg
 
 // Get - get secret for tracked image
 func (g *DefaultGetter) Get(image *types.TrackedImage) (*types.Credentials, error) {
-	if image.Namespace == "" {
-		return nil, ErrNamespaceNotSpecified
-	}
+	//if image.Namespace == "" {
+	//	return nil, ErrNamespaceNotSpecified
+	//}
 
 	// checking in default creds
 	creds, found := g.lookupDefaultDockerConfig(image)
