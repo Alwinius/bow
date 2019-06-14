@@ -5,89 +5,125 @@ import (
 	"github.com/alwinius/keel/provider/helm"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
 	"k8s.io/helm/pkg/manifest"
 	"os"
+	"time"
 )
 
 type Repo struct {
-	ChartPath string
-	Username  string
-	Password  string
-	URL       string
+	ChartPath  string
+	Username   string
+	Password   string
+	URL        string
+	LocalPath  string
+	repository *git.Repository
 }
 
-func (repo Repo) cloneOrUpdate(path string) []manifest.Manifest {
-	var r *git.Repository
+const committerName = "Keel.sh"
+const committerEMail = "admin@example.com"
+
+func (r *Repo) init() {
+	var repository *git.Repository
 	var err error
-
-	logrus.Debug("we are using the repo at", path)
-	if r, err = git.PlainOpen(path); err == nil {
-		origin, err := r.Remote("origin")
-		if err != nil {
-			logrus.Debug("cannot retrieve remote, cloning again")
-			r, _ = repo.newClone(path)
-		} else if origin.Config().URLs[0] != repo.URL {
-			logrus.Debug("repository changed, cloning again")
-			r, _ = repo.newClone(path)
-		} else { // pulling
-			w, _ := r.Worktree()
-			if repo.Username != "" && repo.Password != "" {
-				logrus.Debug("pulling with auth")
-				err = w.Pull(&git.PullOptions{RemoteName: "origin",
-					Auth: &http.BasicAuth{
-						Username: repo.Username,
-						Password: repo.Password,
-					}})
-			} else {
-				logrus.Debug("pulling without auth")
-				err = w.Pull(&git.PullOptions{RemoteName: "origin"})
-			}
+	if r.repository == nil {
+		if repository, err = git.PlainOpen(r.LocalPath); err == nil {
+			origin, err := repository.Remote("origin")
 			if err != nil {
-				logrus.Debug(err)
+				logrus.Debug("cannot retrieve remote, cloning again")
+				repository, _ = r.newClone()
+			} else if origin.Config().URLs[0] != r.URL {
+				logrus.Debug("repository changed, cloning again")
+				repository, _ = r.newClone()
+			} else { // pulling
+				w, _ := repository.Worktree()
+				if r.Username != "" && r.Password != "" {
+					logrus.Debug("pulling with auth")
+					err = w.Pull(&git.PullOptions{RemoteName: "origin",
+						Auth: &http.BasicAuth{
+							Username: r.Username,
+							Password: r.Password,
+						}})
+				} else {
+					logrus.Debug("pulling without auth")
+					err = w.Pull(&git.PullOptions{RemoteName: "origin"})
+				}
+				if err != nil {
+					logrus.Debug(err)
+				}
 			}
+		} else {
+			logrus.Debug("no repo found, cloning")
+			repository, _ = r.newClone()
 		}
-	} else {
-		logrus.Debug("no repo found, cloning")
-		r, _ = repo.newClone(path)
+		r.repository = repository
 	}
+}
 
-	ref, err := r.Head()
-	commit, err := r.CommitObject(ref.Hash())
+func (r *Repo) getManifests() []manifest.Manifest {
+	r.init()
+	ref, err := r.repository.Head()
+	commit, err := r.repository.CommitObject(ref.Hash())
 	logrus.Debug("last commit:", commit.Message)
 
-	finalManifests, err := helm.ProcessTemplate(path + "/" + repo.ChartPath) // because of filepath.abs path is always without /
+	finalManifests, err := helm.ProcessTemplate(r.LocalPath + "/" + r.ChartPath) // because of filepath.abs in main, path is always without /
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	return finalManifests
-
 }
 
-func (repo Repo) newClone(path string) (*git.Repository, error) {
-	err := os.RemoveAll(path)
+func (r *Repo) commitAndPushAll(msg string) error {
+	r.init()
+	w, err := r.repository.Worktree()
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Commit(msg, &git.CommitOptions{
+		All: true,
+		Author: &object.Signature{
+			Name:  committerName,
+			Email: committerEMail,
+			When:  time.Now(),
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	err = r.repository.Push(&git.PushOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Repo) newClone() (*git.Repository, error) {
+	err := os.RemoveAll(r.LocalPath)
 	if err != nil {
 		logrus.Warn(err)
 	}
-	err = os.MkdirAll(path, 0755)
+	err = os.MkdirAll(r.LocalPath, 0755)
 	if err != nil {
 		logrus.Warn(err)
 	}
 
-	if repo.Username != "" && repo.Password != "" {
+	if r.Username != "" && r.Password != "" {
 		logrus.Debug("cloning with auth")
-		return git.PlainClone(path, false, &git.CloneOptions{
+		return git.PlainClone(r.LocalPath, false, &git.CloneOptions{
 			Auth: &http.BasicAuth{
-				Username: repo.Username,
-				Password: repo.Password,
+				Username: r.Username,
+				Password: r.Password,
 			},
-			URL: repo.URL,
+			URL: r.URL,
 		})
 	} else {
 		logrus.Debug("cloning without auth")
-		return git.PlainClone(path, false, &git.CloneOptions{
-			URL: repo.URL,
+		return git.PlainClone(r.LocalPath, false, &git.CloneOptions{
+			URL: r.URL,
 		})
 	}
 }

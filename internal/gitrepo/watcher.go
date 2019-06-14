@@ -7,12 +7,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/cache"
-	"path/filepath"
 	"regexp"
 	"time"
 )
-
-const repoPath = "/home/alwin/projects/keel-tmp/"
 
 func WatchRepo(g *workgroup.Group, repo Repo, log logrus.FieldLogger, rs ...cache.ResourceEventHandler) {
 
@@ -27,8 +24,7 @@ func watch(g *workgroup.Group, repo Repo, log logrus.FieldLogger, rs ...cache.Re
 		log.Println("started")
 		defer log.Println("stopped")
 		for {
-			path, _ := filepath.Abs(repoPath)
-			finalManifests := repo.cloneOrUpdate(path)
+			finalManifests := repo.getManifests()
 
 			var properResources []runtime.Object
 			for _, m := range finalManifests {

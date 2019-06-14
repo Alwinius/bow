@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"fmt"
+	"github.com/alwinius/keel/internal/gitrepo"
 	"regexp"
 	"strings"
 	"time"
@@ -82,6 +83,7 @@ func (p *UpdatePlan) String() string {
 // Provider - kubernetes provider for auto update
 type Provider struct {
 	implementer Implementer
+	repo        gitrepo.Repo
 
 	sender notification.Sender
 
@@ -94,7 +96,7 @@ type Provider struct {
 }
 
 // NewProvider - create new kubernetes based provider
-func NewProvider(implementer Implementer, sender notification.Sender, approvalManager approvals.Manager, cache GenericResourceCache) (*Provider, error) {
+func NewProvider(implementer Implementer, sender notification.Sender, approvalManager approvals.Manager, cache GenericResourceCache, repo gitrepo.Repo) (*Provider, error) {
 	return &Provider{
 		implementer:     implementer,
 		cache:           cache,
@@ -102,6 +104,7 @@ func NewProvider(implementer Implementer, sender notification.Sender, approvalMa
 		events:          make(chan *types.Event, 100),
 		stop:            make(chan struct{}),
 		sender:          sender,
+		repo:            repo,
 	}, nil
 }
 
@@ -241,6 +244,7 @@ func (p *Provider) startInternal() error {
 func (p *Provider) processEvent(event *types.Event) (updated []*k8s.GenericResource, err error) {
 
 	fmt.Println("Someone told us, that", event.Repository.Name, "got a new tag", event.Repository.Tag)
+	fmt.Println("The old tag was ", event.Repository.OldTag)
 	fmt.Println("Now we need to find out where this needs to be added and then commit the new files")
 
 	plans, err := p.createUpdatePlans(&event.Repository)
@@ -291,6 +295,25 @@ func (p *Provider) updateDeployments(plans []*UpdatePlan) (updated []*k8s.Generi
 		annotations["kubernetes.io/change-cause"] = fmt.Sprintf("keel automated update, version %s -> %s [%s]", plan.CurrentVersion, plan.NewVersion, timestamp)
 
 		resource.SetAnnotations(annotations)
+
+		// plan.CurrentVersion, plan.NewVersion are important values here
+
+		// first try the "proper" version
+		fmt.Println("update resource: ")
+
+		for _, img := range resource.GetImages() { // maybe only one of multiple containers needs to be updated, so filter
+			parts := strings.Split(img, ":")
+			if parts[1] == plan.CurrentVersion {
+				// grep img in git
+				// replace
+
+				fmt.Println("updating", img, "to version", plan.NewVersion)
+			}
+		}
+
+		// try to find images in different variations (there can only be a finite number)
+		// replace
+		// commit and push probably later
 
 		err = p.implementer.Update(resource)
 		kubernetesVersionedUpdatesCounter.With(prometheus.Labels{"kubernetes": fmt.Sprintf("%s/%s", resource.Namespace, resource.Name)}).Inc()

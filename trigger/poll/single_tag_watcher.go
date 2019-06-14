@@ -65,6 +65,7 @@ func (j *WatchTagJob) Run() {
 				Name:   j.details.trackedImage.Image.Repository(),
 				Tag:    j.details.trackedImage.Image.Tag(),
 				Digest: currentDigest,
+				OldTag: j.details.trackedImage.Image.Tag(), // if the tag doesnt change we cannot do anything anyway, but consistency
 			},
 			TriggerName: types.TriggerTypePoll.String(),
 		}

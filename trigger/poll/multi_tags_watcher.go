@@ -105,8 +105,9 @@ func (j *WatchRepositoryTagsJob) computeEvents(tags []string) ([]types.Event, er
 			if update && !exists(tag, events) {
 				event := types.Event{
 					Repository: types.Repository{
-						Name: j.details.trackedImage.Image.Repository(),
-						Tag:  tag,
+						Name:   j.details.trackedImage.Image.Repository(),
+						Tag:    tag,
+						OldTag: j.details.trackedImage.Image.Tag(),
 					},
 					TriggerName: types.TriggerTypePoll.String(),
 				}

@@ -81,6 +81,7 @@ const (
 
 // EnvDebug - set to 1 or anything else to enable debug logging
 const EnvDebug = "DEBUG"
+const repoPath = "/home/alwin/projects/keel-tmp/"
 
 func main() {
 	ver := version.GetKeelVersion()
@@ -187,7 +188,8 @@ func main() {
 	buf := k8s.NewBuffer(&g, t, log.StandardLogger(), 128)
 	wl := log.WithField("context", "watch")
 
-	repo := gitrepo.Repo{Username: os.Getenv(EnvRepoUser), Password: os.Getenv(EnvRepoPassword), URL: os.Getenv(EnvRepoURL), ChartPath: os.Getenv(EnvRepoChartPath)}
+	absRepoPath, _ := filepath.Abs(repoPath)
+	repo := gitrepo.Repo{Username: os.Getenv(EnvRepoUser), Password: os.Getenv(EnvRepoPassword), URL: os.Getenv(EnvRepoURL), ChartPath: os.Getenv(EnvRepoChartPath), LocalPath: absRepoPath}
 	gitrepo.WatchRepo(&g, repo, wl, buf)
 
 	// approvalsCache := memory.NewMemoryCache()
@@ -205,6 +207,7 @@ func main() {
 		approvalsManager: approvalsManager,
 		grc:              &t.GenericResourceCache,
 		store:            sqlStore,
+		repo:             repo,
 	})
 
 	// registering secrets based credentials helper
@@ -271,6 +274,7 @@ type ProviderOpts struct {
 	approvalsManager approvals.Manager
 	grc              *k8s.GenericResourceCache
 	store            store.Store
+	repo             gitrepo.Repo
 }
 
 // setupProviders - setting up available providers. New providers should be initialised here and added to
@@ -278,7 +282,7 @@ type ProviderOpts struct {
 func setupProviders(opts *ProviderOpts) (providers provider.Providers) {
 	var enabledProviders []provider.Provider
 
-	k8sProvider, err := kubernetes.NewProvider(opts.k8sImplementer, opts.sender, opts.approvalsManager, opts.grc)
+	k8sProvider, err := kubernetes.NewProvider(opts.k8sImplementer, opts.sender, opts.approvalsManager, opts.grc, opts.repo)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
