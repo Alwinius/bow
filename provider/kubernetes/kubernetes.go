@@ -302,12 +302,16 @@ func (p *Provider) updateDeployments(plans []*UpdatePlan) (updated []*k8s.Generi
 		fmt.Println("update resource: ")
 
 		for _, img := range resource.GetImages() { // maybe only one of multiple containers needs to be updated, so filter
-			parts := strings.Split(img, ":")
+			parts := strings.Split(img, ":") // TODO: handle no tags specified
 			if parts[1] == plan.CurrentVersion {
-				// grep img in git
-				// replace
-
+				p.repo.GrepAndReplace(img, plan.NewVersion)
 				fmt.Println("updating", img, "to version", plan.NewVersion)
+				err := p.repo.CommitAndPushAll("updating " + img + " to version " + plan.NewVersion)
+				if err != nil {
+					fmt.Println(err)
+				}
+			} else {
+				fmt.Println("not updating", img)
 			}
 		}
 

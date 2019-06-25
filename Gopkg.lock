@@ -486,6 +486,27 @@
   version = "1.0.1"
 
 [[projects]]
+  digest = "1:d93e306b20c25201d6116e41f15c43a4db091590c90cbe7af78b6ba21587ba0c"
+  name = "github.com/keel-hq/keel"
+  packages = [
+    "approvals",
+    "cache",
+    "extension/notification",
+    "internal/k8s",
+    "internal/policy",
+    "internal/workgroup",
+    "provider/helm",
+    "types",
+    "util/image",
+    "util/stopper",
+    "util/testing",
+    "util/timeutil",
+  ]
+  pruneopts = "UT"
+  revision = "1c51c7067b85d1109477a7b65eddc48ceca44b28"
+  version = "0.14.2"
+
+[[projects]]
   digest = "1:ae5f4d0779a45e2cb3075d8b3ece6c623e171407f4aac83521392ff06d188871"
   name = "github.com/kevinburke/ssh_config"
   packages = ["."]
@@ -1220,6 +1241,10 @@
     "github.com/gorilla/mux",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/sqlite",
+    "github.com/keel-hq/keel/provider/helm",
+    "github.com/keel-hq/keel/types",
+    "github.com/keel-hq/keel/util/image",
+    "github.com/keel-hq/keel/util/testing",
     "github.com/nlopes/slack",
     "github.com/opencontainers/go-digest",
     "github.com/prometheus/client_golang/prometheus",
@@ -1235,6 +1260,7 @@
     "google.golang.org/grpc",
     "gopkg.in/alecthomas/kingpin.v2",
     "gopkg.in/src-d/go-git.v4",
+    "gopkg.in/src-d/go-git.v4/plumbing/object",
     "gopkg.in/src-d/go-git.v4/plumbing/transport/http",
     "k8s.io/api/apps/v1",
     "k8s.io/api/batch/v1beta1",
@@ -1242,7 +1268,6 @@
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/fields",
     "k8s.io/apimachinery/pkg/runtime",
-    "k8s.io/apimachinery/pkg/util/validation",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/kubernetes/scheme",
     "k8s.io/client-go/kubernetes/typed/core/v1",

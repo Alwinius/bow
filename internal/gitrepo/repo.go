@@ -3,12 +3,16 @@ package gitrepo
 import (
 	"fmt"
 	"github.com/alwinius/keel/provider/helm"
+	"github.com/alwinius/keel/util/image"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
+	"io/ioutil"
 	"k8s.io/helm/pkg/manifest"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -39,18 +43,19 @@ func (r *Repo) init() {
 			} else { // pulling
 				w, _ := repository.Worktree()
 				if r.Username != "" && r.Password != "" {
-					logrus.Debug("pulling with auth")
+					logrus.Debug("pulling with user/pass auth")
 					err = w.Pull(&git.PullOptions{RemoteName: "origin",
 						Auth: &http.BasicAuth{
 							Username: r.Username,
 							Password: r.Password,
 						}})
 				} else {
-					logrus.Debug("pulling without auth")
+					logrus.Debug("pulling with ssh private key")
 					err = w.Pull(&git.PullOptions{RemoteName: "origin"})
 				}
-				if err != nil {
+				if err != nil && err != git.NoErrAlreadyUpToDate {
 					logrus.Debug(err)
+					repository, _ = r.newClone()
 				}
 			}
 		} else {
@@ -75,28 +80,38 @@ func (r *Repo) getManifests() []manifest.Manifest {
 	return finalManifests
 }
 
-func (r *Repo) commitAndPushAll(msg string) error {
+func (r *Repo) CommitAndPushAll(msg string) error {
 	r.init()
 	w, err := r.repository.Worktree()
 	if err != nil {
 		return err
 	}
 
-	_, err = w.Commit(msg, &git.CommitOptions{
-		All: true,
-		Author: &object.Signature{
-			Name:  committerName,
-			Email: committerEMail,
-			When:  time.Now(),
-		},
-	})
-	if err != nil {
-		return err
-	}
+	changes, _ := w.Status()
+	fmt.Println("We have", len(changes), "changed files")
+	if len(changes) > 0 {
 
-	err = r.repository.Push(&git.PushOptions{})
-	if err != nil {
-		return err
+		_, err = w.Commit(msg, &git.CommitOptions{
+			All: true,
+			Author: &object.Signature{
+				Name:  committerName,
+				Email: committerEMail,
+				When:  time.Now(),
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		err = r.repository.Push(&git.PushOptions{
+			Auth: &http.BasicAuth{
+				Username: r.Username,
+				Password: r.Password,
+			},
+		})
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -112,7 +127,7 @@ func (r *Repo) newClone() (*git.Repository, error) {
 	}
 
 	if r.Username != "" && r.Password != "" {
-		logrus.Debug("cloning with auth")
+		logrus.Debug("cloning with user/password auth")
 		return git.PlainClone(r.LocalPath, false, &git.CloneOptions{
 			Auth: &http.BasicAuth{
 				Username: r.Username,
@@ -121,9 +136,51 @@ func (r *Repo) newClone() (*git.Repository, error) {
 			URL: r.URL,
 		})
 	} else {
-		logrus.Debug("cloning without auth")
+		logrus.Debug("cloning with ssh auth")
 		return git.PlainClone(r.LocalPath, false, &git.CloneOptions{
 			URL: r.URL,
 		})
+	}
+}
+
+func (r *Repo) GrepAndReplace(oldImage string, newTag string) {
+	r.init()
+	ref, err := image.Parse(oldImage)
+
+	err = filepath.Walk(r.LocalPath,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() {
+				reader, err := os.Open(path)
+				if err != nil {
+					logrus.Fatal(err)
+				}
+				defer reader.Close()
+
+				var changed string
+				b, err := ioutil.ReadAll(reader)
+				if ref.Registry() == image.DefaultRegistryHostname {
+					changed = strings.ReplaceAll(string(b), oldImage, fmt.Sprintf("%s:%s", ref.ShortName(), newTag))
+				} else {
+					changed = strings.ReplaceAll(string(b), oldImage, fmt.Sprintf("%s:%s", ref.Repository(), newTag))
+				}
+
+				if changed != string(b) {
+					writer, _ := os.Create(path)
+					defer writer.Close()
+					_, err = writer.WriteString(changed)
+
+					if err != nil {
+						logrus.Fatal(err)
+					}
+				}
+			}
+
+			return err
+		})
+	if err != nil {
+		logrus.Error(err)
 	}
 }
