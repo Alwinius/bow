@@ -1,7 +1,6 @@
 package gitrepo
 
 import (
-	"fmt"
 	"github.com/alwinius/keel/internal/workgroup"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -18,9 +17,7 @@ func WatchRepo(g *workgroup.Group, repo Repo, log logrus.FieldLogger, rs ...cach
 
 func watch(g *workgroup.Group, repo Repo, log logrus.FieldLogger, rs ...cache.ResourceEventHandler) {
 
-	// TODO: use cache, dont just add every time or evaluate if this is necessary
-
-	g.Add(func(stop <-chan struct{}) {
+	g.Add(func(stop <-chan struct{}) { // adding multiple times here doesnt matter because it will overwrite existing
 		log.Println("started")
 		defer log.Println("stopped")
 		for {
@@ -28,10 +25,10 @@ func watch(g *workgroup.Group, repo Repo, log logrus.FieldLogger, rs ...cache.Re
 
 			var properResources []runtime.Object
 			for _, m := range finalManifests {
-				if gr, err := yamlToGenericResource(m.Content); err == nil {
+				if gr, err := yamlToGenericResource(m.Content); err == nil && gr != nil {
 					properResources = append(properResources, gr)
-				} else {
-					log.Debug(err)
+				} else if err != nil {
+					logrus.Debug(err)
 				}
 			}
 
@@ -128,7 +125,7 @@ func yamlToGenericResource(r string) (runtime.Object, error) {
 		return nil, err
 	}
 	if !acceptedK8sTypes.MatchString(groupVersionKind.Kind) {
-		return nil, fmt.Errorf("skipping object with type: %s", groupVersionKind.Kind)
+		return nil, nil
 	} else {
 		return obj, nil
 	}

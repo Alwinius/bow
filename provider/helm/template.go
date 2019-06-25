@@ -60,7 +60,7 @@ func ProcessTemplate(path string) ([]manifest.Manifest, error) {
 	renderOpts := renderutil.Options{
 		ReleaseOptions: chartutil.ReleaseOptions{
 			Name:      releaseName,
-			IsInstall: !false,
+			IsInstall: true,
 			IsUpgrade: false,
 			Time:      timeconv.Now(),
 			Namespace: namespace,
@@ -75,8 +75,6 @@ func ProcessTemplate(path string) ([]manifest.Manifest, error) {
 
 	listManifests := manifest.SplitManifests(renderedTemplates)
 	var manifestsToRender []manifest.Manifest
-
-	fmt.Println("we have", len(listManifests), "manifests")
 
 	// render all manifests in the chart
 	manifestsToRender = listManifests

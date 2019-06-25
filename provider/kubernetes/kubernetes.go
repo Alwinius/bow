@@ -238,11 +238,6 @@ func (p *Provider) startInternal() error {
 }
 
 func (p *Provider) processEvent(event *types.Event) (updated []*k8s.GenericResource, err error) {
-
-	fmt.Println("Someone told us, that", event.Repository.Name, "got a new tag", event.Repository.Tag)
-	fmt.Println("The old tag was ", event.Repository.OldTag)
-	fmt.Println("Now we need to find out where this needs to be added and then commit the new files")
-
 	plans, err := p.createUpdatePlans(&event.Repository)
 	if err != nil {
 		return nil, err
@@ -292,53 +287,24 @@ func (p *Provider) updateDeployments(plans []*UpdatePlan) (updated []*k8s.Generi
 
 		resource.SetAnnotations(annotations)
 
-		// plan.CurrentVersion, plan.NewVersion are important values here
-
-		// first try the "proper" version
-		fmt.Println("update resource: ")
-
 		for _, img := range resource.GetImages() { // maybe only one of multiple containers needs to be updated, so filter
-			parts := strings.Split(img, ":") // TODO: handle no tags specified
-			if parts[1] == plan.CurrentVersion {
+			parts := strings.Split(img, ":")
+			if len(parts) > 1 && parts[1] == plan.CurrentVersion { // images without a tag will be ignored
 				p.repo.GrepAndReplace(img, plan.NewVersion)
-				fmt.Println("updating", img, "to version", plan.NewVersion)
 				err := p.repo.CommitAndPushAll("updating " + img + " to version " + plan.NewVersion)
 				if err != nil {
-					fmt.Println(err)
+					log.WithFields(log.Fields{
+						"error":      err,
+						"namespace":  resource.Namespace,
+						"deployment": resource.Name,
+						"kind":       resource.Kind(),
+						"update":     fmt.Sprintf("%s->%s", plan.CurrentVersion, plan.NewVersion),
+					}).Error("provider.kubernetes: got error while committing and pushing")
 				}
-			} else {
-				fmt.Println("not updating", img)
 			}
 		}
 
 		kubernetesVersionedUpdatesCounter.With(prometheus.Labels{"kubernetes": fmt.Sprintf("%s/%s", resource.Namespace, resource.Name)}).Inc()
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error":      err,
-				"namespace":  resource.Namespace,
-				"deployment": resource.Name,
-				"kind":       resource.Kind(),
-				"update":     fmt.Sprintf("%s->%s", plan.CurrentVersion, plan.NewVersion),
-			}).Error("provider.kubernetes: got error while updating resource")
-
-			p.sender.Send(types.EventNotification{
-				Name:         "update resource",
-				ResourceKind: resource.Kind(),
-				Identifier:   resource.Identifier,
-				Message:      fmt.Sprintf("%s %s/%s update %s->%s failed, error: %s", resource.Kind(), resource.Namespace, resource.Name, plan.CurrentVersion, plan.NewVersion, err),
-				CreatedAt:    time.Now(),
-				Type:         types.NotificationDeploymentUpdate,
-				Level:        types.LevelError,
-				Channels:     notificationChannels,
-				Metadata: map[string]string{
-					"provider":  p.GetName(),
-					"namespace": resource.GetNamespace(),
-					"name":      resource.GetName(),
-				},
-			})
-
-			continue
-		}
 
 		err = p.updateComplete(plan)
 		if err != nil {
@@ -385,28 +351,6 @@ func (p *Provider) updateDeployments(plans []*UpdatePlan) (updated []*k8s.Generi
 	}
 
 	return
-}
-
-func getDesiredImage(delta map[string]string, currentImage string) (string, error) {
-	currentRef, err := image.Parse(currentImage)
-	if err != nil {
-		return "", err
-	}
-	for repository, tag := range delta {
-		if repository == currentRef.Repository() {
-			ref, err := image.Parse(repository)
-			if err != nil {
-				return "", err
-			}
-
-			// updating image
-			if ref.Registry() == image.DefaultRegistryHostname {
-				return fmt.Sprintf("%s:%s", ref.ShortName(), tag), nil
-			}
-			return fmt.Sprintf("%s:%s", ref.Repository(), tag), nil
-		}
-	}
-	return "", fmt.Errorf("image %s not found in deltas", currentImage)
 }
 
 // createUpdatePlans - impacted deployments by changed repository

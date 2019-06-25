@@ -68,8 +68,8 @@ func (r *Repo) init() {
 
 func (r *Repo) getManifests() []manifest.Manifest {
 	r.init()
-	ref, err := r.repository.Head()
-	commit, err := r.repository.CommitObject(ref.Hash())
+	ref, _ := r.repository.Head()
+	commit, _ := r.repository.CommitObject(ref.Hash())
 	logrus.Debug("last commit:", commit.Message)
 
 	finalManifests, err := helm.ProcessTemplate(r.LocalPath + "/" + r.ChartPath) // because of filepath.abs in main, path is always without /
@@ -88,7 +88,6 @@ func (r *Repo) CommitAndPushAll(msg string) error {
 	}
 
 	changes, _ := w.Status()
-	fmt.Println("We have", len(changes), "changed files")
 	if len(changes) > 0 {
 		_, err = w.Commit(msg, &git.CommitOptions{
 			All: true,

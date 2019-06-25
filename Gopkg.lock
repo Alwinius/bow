@@ -486,27 +486,6 @@
   version = "1.0.1"
 
 [[projects]]
-  digest = "1:d93e306b20c25201d6116e41f15c43a4db091590c90cbe7af78b6ba21587ba0c"
-  name = "github.com/keel-hq/keel"
-  packages = [
-    "approvals",
-    "cache",
-    "extension/notification",
-    "internal/k8s",
-    "internal/policy",
-    "internal/workgroup",
-    "provider/helm",
-    "types",
-    "util/image",
-    "util/stopper",
-    "util/testing",
-    "util/timeutil",
-  ]
-  pruneopts = "UT"
-  revision = "1c51c7067b85d1109477a7b65eddc48ceca44b28"
-  version = "0.14.2"
-
-[[projects]]
   digest = "1:ae5f4d0779a45e2cb3075d8b3ece6c623e171407f4aac83521392ff06d188871"
   name = "github.com/kevinburke/ssh_config"
   packages = ["."]
@@ -1241,10 +1220,6 @@
     "github.com/gorilla/mux",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/sqlite",
-    "github.com/keel-hq/keel/provider/helm",
-    "github.com/keel-hq/keel/types",
-    "github.com/keel-hq/keel/util/image",
-    "github.com/keel-hq/keel/util/testing",
     "github.com/nlopes/slack",
     "github.com/opencontainers/go-digest",
     "github.com/prometheus/client_golang/prometheus",

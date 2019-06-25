@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/keel-hq/keel/provider/helm"
-	"github.com/keel-hq/keel/types"
-	"github.com/keel-hq/keel/util/image"
-	testutil "github.com/keel-hq/keel/util/testing"
+	"github.com/alwinius/keel/provider/helm"
+	"github.com/alwinius/keel/types"
+	"github.com/alwinius/keel/util/image"
+	testutil "github.com/alwinius/keel/util/testing"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -380,7 +380,7 @@ func TestLookupHelmNoSecretsFound(t *testing.T) {
 		Error: fmt.Errorf("not found"),
 	}
 
-	getter := NewGetter(impl, nil)
+	getter := NewGetter(nil)
 
 	trackedImage := &types.TrackedImage{
 		Image:     imgRef,
@@ -431,7 +431,7 @@ func TestLookupWithPortedRegistry(t *testing.T) {
 		},
 	}
 
-	getter := NewGetter(impl, nil)
+	getter := NewGetter(nil)
 
 	trackedImage := &types.TrackedImage{
 		Image:     imgRef,
