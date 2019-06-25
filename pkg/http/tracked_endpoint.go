@@ -98,7 +98,7 @@ func (s *TriggerServer) trackSetHandler(resp http.ResponseWriter, req *http.Requ
 
 			v.SetAnnotations(ann)
 
-			err := s.kubernetesClient.Update(v)
+			//err := s.kubernetesClient.Update(v)
 
 			response(&APIResponse{Status: "updated"}, 200, err, resp, req)
 			return

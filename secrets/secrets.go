@@ -8,11 +8,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/alwinius/keel/provider/helm"
-	"github.com/alwinius/keel/provider/kubernetes"
 	"github.com/alwinius/keel/types"
-
-	v1 "k8s.io/api/core/v1"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -35,12 +31,11 @@ type Getter interface {
 
 // DefaultGetter - default kubernetes secret getter implementation
 type DefaultGetter struct {
-	kubernetesImplementer kubernetes.Implementer
-	defaultDockerConfig   DockerCfg // default configuration supplied by optional environment variable
+	defaultDockerConfig DockerCfg // default configuration supplied by optional environment variable
 }
 
 // NewGetter - create new default getter
-func NewGetter(implementer kubernetes.Implementer, defaultDockerConfig DockerCfg) *DefaultGetter {
+func NewGetter(defaultDockerConfig DockerCfg) *DefaultGetter {
 
 	// initialising empty configuration
 	if defaultDockerConfig == nil {
@@ -48,8 +43,7 @@ func NewGetter(implementer kubernetes.Implementer, defaultDockerConfig DockerCfg
 	}
 
 	return &DefaultGetter{
-		kubernetesImplementer: implementer,
-		defaultDockerConfig:   defaultDockerConfig,
+		defaultDockerConfig: defaultDockerConfig,
 	}
 }
 
@@ -65,190 +59,13 @@ func (g *DefaultGetter) Get(image *types.TrackedImage) (*types.Credentials, erro
 		return creds, nil
 	}
 
-	switch image.Provider {
-	case helm.ProviderName:
-		if len(image.Secrets) == 0 {
-			// looking up secrets based on selector
-			secrets, err := g.lookupSecrets(image)
-			if err != nil {
-				return nil, err
-			}
+	return nil, ErrSecretsNotSpecified
 
-			// populating secrets
-			image.Secrets = secrets
-		}
-	}
-	if len(image.Secrets) == 0 {
-		return nil, ErrSecretsNotSpecified
-	}
-
-	return g.getCredentialsFromSecret(image)
+	//	return g.getCredentialsFromSecret(image)
 }
 
 func (g *DefaultGetter) lookupDefaultDockerConfig(image *types.TrackedImage) (*types.Credentials, bool) {
 	return credentialsFromConfig(image, g.defaultDockerConfig)
-}
-
-func (g *DefaultGetter) lookupSecrets(image *types.TrackedImage) ([]string, error) {
-	secrets := []string{}
-
-	selector, ok := image.Meta["selector"]
-	if !ok {
-		// nothing
-		return secrets, nil
-	}
-
-	podList, err := g.kubernetesImplementer.Pods(image.Namespace, selector)
-	if err != nil {
-		return secrets, err
-	}
-
-	for _, pod := range podList.Items {
-		podSecrets := getPodImagePullSecrets(&pod)
-		log.WithFields(log.Fields{
-			"namespace":    image.Namespace,
-			"provider":     image.Provider,
-			"registry":     image.Image.Registry(),
-			"image":        image.Image.Repository(),
-			"pod_selector": selector,
-			"secrets":      podSecrets,
-		}).Debug("secrets.defaultGetter.lookupSecrets: pod secrets found")
-		secrets = append(secrets, podSecrets...)
-	}
-
-	if len(secrets) == 0 {
-		log.WithFields(log.Fields{
-			"namespace":    image.Namespace,
-			"provider":     image.Provider,
-			"registry":     image.Image.Registry(),
-			"image":        image.Image.Repository(),
-			"pod_selector": selector,
-			"pods_checked": len(podList.Items),
-		}).Debug("secrets.defaultGetter.lookupSecrets: no secrets for image found")
-	}
-
-	return secrets, nil
-}
-
-func getPodImagePullSecrets(pod *v1.Pod) []string {
-	var secrets []string
-	for _, s := range pod.Spec.ImagePullSecrets {
-		secrets = append(secrets, s.Name)
-	}
-	return secrets
-}
-
-func (g *DefaultGetter) getCredentialsFromSecret(image *types.TrackedImage) (*types.Credentials, error) {
-
-	credentials := &types.Credentials{}
-	secretFound := false
-
-	for _, secretRef := range image.Secrets {
-		secret, err := g.kubernetesImplementer.Secret(image.Namespace, secretRef)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"image":      image.Image.Repository(),
-				"namespace":  image.Namespace,
-				"secret_ref": secretRef,
-				"error":      err,
-			}).Warn("secrets.defaultGetter: failed to get secret")
-			continue
-		}
-
-		var dockerCfg DockerCfg
-
-		switch secret.Type {
-		case v1.SecretTypeDockercfg:
-			secretDataBts, ok := secret.Data[dockerConfigKey]
-			if !ok {
-				log.WithFields(log.Fields{
-					"image":      image.Image.Repository(),
-					"namespace":  image.Namespace,
-					"secret_ref": secretRef,
-					"type":       secret.Type,
-					"data":       secret.Data,
-				}).Warn("secrets.defaultGetter: secret is missing key '.dockerconfig', ensure that key exists")
-				continue
-			}
-			dockerCfg, err = decodeSecret(secretDataBts)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"image":       image.Image.Repository(),
-					"namespace":   image.Namespace,
-					"secret_ref":  secretRef,
-					"secret_data": string(secretDataBts),
-					"error":       err,
-				}).Error("secrets.defaultGetter: failed to decode secret")
-				continue
-			}
-			secretFound = true
-		case v1.SecretTypeDockerConfigJson:
-			secretDataBts, ok := secret.Data[dockerConfigJSONKey]
-			if !ok {
-				log.WithFields(log.Fields{
-					"image":      image.Image.Repository(),
-					"namespace":  image.Namespace,
-					"secret_ref": secretRef,
-					"type":       secret.Type,
-					"data":       secret.Data,
-				}).Warn("secrets.defaultGetter: secret is missing key '.dockerconfigjson', ensure that key exists")
-				continue
-			}
-			secretFound = true
-
-			dockerCfg, err = DecodeDockerCfgJson(secretDataBts)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"image":       image.Image.Repository(),
-					"namespace":   image.Namespace,
-					"secret_ref":  secretRef,
-					"secret_data": string(secretDataBts),
-					"error":       err,
-				}).Error("secrets.defaultGetter: failed to decode secret")
-				continue
-			}
-			secretFound = true
-
-		default:
-			log.WithFields(log.Fields{
-				"image":      image.Image.Repository(),
-				"namespace":  image.Namespace,
-				"secret_ref": secretRef,
-				"type":       secret.Type,
-			}).Warn("secrets.defaultGetter: supplied secret is not kubernetes.io/dockercfg, ignoring")
-			continue
-		}
-
-		creds, found := credentialsFromConfig(image, dockerCfg)
-		if found {
-			return creds, nil
-		} else {
-			log.WithFields(log.Fields{
-				"secret_ref": secretRef,
-				"image":      image.Image.String(),
-			}).Warn("secrets.defaultGetter: registry not found among secrets")
-		}
-	}
-
-	if secretFound {
-		log.WithFields(log.Fields{
-			"namespace": image.Namespace,
-			"provider":  image.Provider,
-			"registry":  image.Image.Registry(),
-			"image":     image.Image.Repository(),
-			"secrets":   image.Secrets,
-		}).Warn("secrets.defaultGetter.lookupSecrets: secret found but couldn't detect authentication for the desired registry")
-	} else if len(image.Secrets) > 0 {
-		log.WithFields(log.Fields{
-			"namespace": image.Namespace,
-			"provider":  image.Provider,
-			"registry":  image.Image.Registry(),
-			"image":     image.Image.Repository(),
-			"secrets":   image.Secrets,
-		}).Errorf("secrets.defaultGetter.lookupSecrets: docker credentials were not found among secrets, is secret in the namespace '%s'?", image.Namespace)
-	}
-
-	return credentials, nil
 }
 
 func credentialsFromConfig(image *types.TrackedImage, cfg DockerCfg) (*types.Credentials, bool) {

@@ -20,7 +20,6 @@ import (
 	"github.com/alwinius/keel/pkg/auth"
 	"github.com/alwinius/keel/pkg/store"
 	"github.com/alwinius/keel/provider"
-	"github.com/alwinius/keel/provider/kubernetes"
 	"github.com/alwinius/keel/types"
 	"github.com/alwinius/keel/version"
 
@@ -40,8 +39,6 @@ type Opts struct {
 
 	GRC *k8s.GenericResourceCache
 
-	KubernetesClient kubernetes.Implementer
-
 	Store store.Store
 
 	UIDir string
@@ -51,8 +48,7 @@ type Opts struct {
 
 // TriggerServer - webhook trigger & healthcheck server
 type TriggerServer struct {
-	grc              *k8s.GenericResourceCache
-	kubernetesClient kubernetes.Implementer
+	grc *k8s.GenericResourceCache
 
 	providers        provider.Providers
 	approvalsManager approvals.Manager
@@ -73,7 +69,6 @@ func NewTriggerServer(opts *Opts) *TriggerServer {
 	return &TriggerServer{
 		port:                  opts.Port,
 		grc:                   opts.GRC,
-		kubernetesClient:      opts.KubernetesClient,
 		providers:             opts.Providers,
 		approvalsManager:      opts.ApprovalManager,
 		router:                mux.NewRouter(),

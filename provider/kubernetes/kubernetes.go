@@ -10,8 +10,6 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/rusenask/cron"
 
-	v1 "k8s.io/api/core/v1"
-
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/alwinius/keel/approvals"
@@ -82,8 +80,7 @@ func (p *UpdatePlan) String() string {
 
 // Provider - kubernetes provider for auto update
 type Provider struct {
-	implementer Implementer
-	repo        gitrepo.Repo
+	repo gitrepo.Repo
 
 	sender notification.Sender
 
@@ -96,9 +93,8 @@ type Provider struct {
 }
 
 // NewProvider - create new kubernetes based provider
-func NewProvider(implementer Implementer, sender notification.Sender, approvalManager approvals.Manager, cache GenericResourceCache, repo gitrepo.Repo) (*Provider, error) {
+func NewProvider(sender notification.Sender, approvalManager approvals.Manager, cache GenericResourceCache, repo gitrepo.Repo) (*Provider, error) {
 	return &Provider{
-		implementer:     implementer,
 		cache:           cache,
 		approvalManager: approvalManager,
 		events:          make(chan *types.Event, 100),
@@ -315,11 +311,6 @@ func (p *Provider) updateDeployments(plans []*UpdatePlan) (updated []*k8s.Generi
 			}
 		}
 
-		// try to find images in different variations (there can only be a finite number)
-		// replace
-		// commit and push probably later
-
-		err = p.implementer.Update(resource)
 		kubernetesVersionedUpdatesCounter.With(prometheus.Labels{"kubernetes": fmt.Sprintf("%s/%s", resource.Namespace, resource.Name)}).Inc()
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -449,8 +440,4 @@ func (p *Provider) createUpdatePlans(repo *types.Repository) ([]*UpdatePlan, err
 	}
 
 	return impacted, nil
-}
-
-func (p *Provider) namespaces() (*v1.NamespaceList, error) {
-	return p.implementer.Namespaces()
 }

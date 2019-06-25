@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/provider/kubernetes"
 	"github.com/alwinius/keel/types"
 
 	log "github.com/sirupsen/logrus"
@@ -80,7 +79,6 @@ type ApprovalResponse struct {
 // BotManager holds approvalsManager and k8sImplementer for every bot
 type BotManager struct {
 	approvalsManager   approvals.Manager
-	k8sImplementer     kubernetes.Implementer
 	botMessagesChannel chan *BotMessage
 	approvalsRespCh    chan *ApprovalResponse
 }
@@ -110,10 +108,9 @@ func RegisterBot(name string, b Bot) {
 }
 
 // Run all implemented bots
-func Run(k8sImplementer kubernetes.Implementer, approvalsManager approvals.Manager) {
+func Run(approvalsManager approvals.Manager) {
 	bm := &BotManager{
 		approvalsManager:   approvalsManager,
-		k8sImplementer:     k8sImplementer,
 		approvalsRespCh:    make(chan *ApprovalResponse), // don't add buffer to make it blocking
 		botMessagesChannel: make(chan *BotMessage),
 	}
@@ -181,26 +178,6 @@ func IsBotCommand(eventText string) bool {
 	return false
 }
 
-func (bm *BotManager) handleCommand(eventText string) string {
-	switch eventText {
-	case "get deployments":
-		log.Info("HandleCommand: getting deployments")
-		return DeploymentsResponse(Filter{}, bm.k8sImplementer)
-	case "get approvals":
-		log.Info("HandleCommand: getting approvals")
-		return ApprovalsResponse(bm.approvalsManager)
-	}
-
-	// handle dynamic commands
-	if strings.HasPrefix(eventText, RemoveApprovalPrefix) {
-		id := strings.TrimSpace(strings.TrimPrefix(eventText, RemoveApprovalPrefix))
-		return RemoveApprovalHandler(id, bm.approvalsManager)
-	}
-
-	log.Infof("bot.HandleCommand(): command [%s] not found", eventText)
-	return ""
-}
-
 func (bm *BotManager) handleBotMessage(m *BotMessage) string {
 	command := m.Message
 
@@ -214,7 +191,7 @@ func (bm *BotManager) handleBotMessage(m *BotMessage) string {
 	}
 
 	if IsBotCommand(command) {
-		return bm.handleCommand(command)
+		return fmt.Sprintf("bot commands not supported any more '%s'", command)
 	}
 
 	log.WithFields(log.Fields{

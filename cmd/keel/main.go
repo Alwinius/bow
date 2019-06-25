@@ -74,11 +74,6 @@ const (
 	EnvDefaultDockerRegistryCfg = "DOCKER_REGISTRY_CFG"
 )
 
-// kubernetes config, if empty - will default to InCluster
-const (
-	EnvKubernetesConfig = "KUBERNETES_CONFIG"
-)
-
 // EnvDebug - set to 1 or anything else to enable debug logging
 const EnvDebug = "DEBUG"
 const repoPath = "/home/alwin/projects/keel-tmp/"
@@ -86,8 +81,6 @@ const repoPath = "/home/alwin/projects/keel-tmp/"
 func main() {
 	ver := version.GetKeelVersion()
 
-	inCluster := kingpin.Flag("incluster", "use in cluster configuration (defaults to 'true'), use '--no-incluster' if running outside of the cluster").Default("true").Bool()
-	kubeconfig := kingpin.Flag("kubeconfig", "path to kubeconfig (if not in running inside a cluster)").Default(filepath.Join(os.Getenv("HOME"), ".kube", "config")).String()
 	uiDir := kingpin.Flag("ui-dir", "path to web UI static files").Default("www").Envar(EnvUIDir).String()
 
 	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(ver.Version)
@@ -160,25 +153,6 @@ func main() {
 		}).Fatal("main: failed to configure notification sender manager")
 	}
 
-	// getting k8s provider
-	k8sCfg := &kubernetes.Opts{
-		ConfigPath: *kubeconfig,
-	}
-
-	if os.Getenv(EnvKubernetesConfig) != "" {
-		k8sCfg.ConfigPath = os.Getenv(EnvKubernetesConfig)
-	}
-
-	k8sCfg.InCluster = *inCluster
-
-	implementer, err := kubernetes.NewKubernetesImplementer(k8sCfg)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":  err,
-			"config": k8sCfg,
-		}).Fatal("main: failed to create kubernetes implementer")
-	}
-
 	var g workgroup.Group
 
 	t := &k8s.Translator{
@@ -202,7 +176,6 @@ func main() {
 
 	// setting up providers
 	providers := setupProviders(&ProviderOpts{
-		k8sImplementer:   implementer,
 		sender:           sender,
 		approvalsManager: approvalsManager,
 		grc:              &t.GenericResourceCache,
@@ -221,7 +194,7 @@ func main() {
 			}).Fatalf("failed to decode secret provided in %s env variable", EnvDefaultDockerRegistryCfg)
 		}
 	}
-	secretsGetter := secrets.NewGetter(implementer, dockerConfig)
+	secretsGetter := secrets.NewGetter(dockerConfig)
 
 	ch := secretsCredentialsHelper.New(secretsGetter)
 	credentialshelper.RegisterCredentialsHelper("secrets", ch)
@@ -232,12 +205,11 @@ func main() {
 		providers:        providers,
 		approvalsManager: approvalsManager,
 		grc:              &t.GenericResourceCache,
-		k8sClient:        implementer,
 		store:            sqlStore,
 		uiDir:            *uiDir,
 	})
 
-	bot.Run(implementer, approvalsManager)
+	bot.Run(approvalsManager) // the bot handles communication via Slack
 
 	signalChan := make(chan os.Signal, 1)
 	cleanupDone := make(chan bool)
@@ -269,7 +241,6 @@ func main() {
 }
 
 type ProviderOpts struct {
-	k8sImplementer   kubernetes.Implementer
 	sender           notification.Sender
 	approvalsManager approvals.Manager
 	grc              *k8s.GenericResourceCache
@@ -282,7 +253,7 @@ type ProviderOpts struct {
 func setupProviders(opts *ProviderOpts) (providers provider.Providers) {
 	var enabledProviders []provider.Provider
 
-	k8sProvider, err := kubernetes.NewProvider(opts.k8sImplementer, opts.sender, opts.approvalsManager, opts.grc, opts.repo)
+	k8sProvider, err := kubernetes.NewProvider(opts.sender, opts.approvalsManager, opts.grc, opts.repo)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
@@ -325,7 +296,6 @@ type TriggerOpts struct {
 	providers        provider.Providers
 	approvalsManager approvals.Manager
 	grc              *k8s.GenericResourceCache
-	k8sClient        kubernetes.Implementer
 	store            store.Store
 	uiDir            string
 }
@@ -345,7 +315,6 @@ func setupTriggers(ctx context.Context, opts *TriggerOpts) (teardown func()) {
 	whs := http.NewTriggerServer(&http.Opts{
 		Port:                  types.KeelDefaultPort,
 		GRC:                   opts.grc,
-		KubernetesClient:      opts.k8sClient,
 		Providers:             opts.providers,
 		ApprovalManager:       opts.approvalsManager,
 		Store:                 opts.store,

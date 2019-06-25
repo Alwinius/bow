@@ -90,7 +90,6 @@ func (r *Repo) CommitAndPushAll(msg string) error {
 	changes, _ := w.Status()
 	fmt.Println("We have", len(changes), "changed files")
 	if len(changes) > 0 {
-
 		_, err = w.Commit(msg, &git.CommitOptions{
 			All: true,
 			Author: &object.Signature{
@@ -103,12 +102,18 @@ func (r *Repo) CommitAndPushAll(msg string) error {
 			return err
 		}
 
-		err = r.repository.Push(&git.PushOptions{
-			Auth: &http.BasicAuth{
-				Username: r.Username,
-				Password: r.Password,
-			},
-		})
+		if r.Username != "" && r.Password != "" {
+			logrus.Debug("pushing with user/password auth")
+			err = r.repository.Push(&git.PushOptions{
+				Auth: &http.BasicAuth{
+					Username: r.Username,
+					Password: r.Password,
+				},
+			})
+		} else {
+			logrus.Debug("pushing with ssh auth")
+			err = r.repository.Push(&git.PushOptions{})
+		}
 		if err != nil {
 			return err
 		}

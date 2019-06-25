@@ -99,7 +99,7 @@ func (s *TriggerServer) approvalSetHandler(resp http.ResponseWriter, req *http.R
 
 			v.SetAnnotations(ann)
 
-			err := s.kubernetesClient.Update(v)
+			//err := s.kubernetesClient.Update(v)
 
 			response(&APIResponse{Status: "updated"}, 200, err, resp, req)
 			return
