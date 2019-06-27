@@ -23,6 +23,9 @@
 
 # Keel - automated Kubernetes deployments for the rest of us
 
+## New readme: [new_readme.md](new_readme.md) 
+
+
 * Website [https://keel.sh](https://keel.sh)
 * Slack - [kubernetes.slack.com](https://kubernetes.slack.com) look for channel #keel
 

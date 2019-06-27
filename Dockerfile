@@ -11,7 +11,7 @@ RUN yarn run lint --no-fix
 RUN yarn run build
 
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates openssh
 
 VOLUME /data
 ENV XDG_DATA_HOME /data

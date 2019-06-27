@@ -5,9 +5,12 @@ import (
 	"github.com/alwinius/keel/provider/helm"
 	"github.com/alwinius/keel/util/image"
 	"github.com/sirupsen/logrus"
+	cryptossh "golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 	"io/ioutil"
 	"k8s.io/helm/pkg/manifest"
 	"os"
@@ -22,6 +25,7 @@ type Repo struct {
 	Password   string
 	URL        string
 	LocalPath  string
+	auth       transport.AuthMethod
 	repository *git.Repository
 }
 
@@ -32,37 +36,98 @@ func (r *Repo) init() {
 	var repository *git.Repository
 	var err error
 	if r.repository == nil {
+		r.setupAuth()
+
 		if repository, err = git.PlainOpen(r.LocalPath); err == nil {
 			origin, err := repository.Remote("origin")
 			if err != nil {
 				logrus.Debug("cannot retrieve remote, cloning again")
-				repository, _ = r.newClone()
+				repository, err = r.newClone()
+				if err != nil {
+					logrus.Error("error during clone: ", err)
+					return
+				}
 			} else if origin.Config().URLs[0] != r.URL {
 				logrus.Debug("repository changed, cloning again")
-				repository, _ = r.newClone()
-			} else { // pulling
-				w, _ := repository.Worktree()
-				if r.Username != "" && r.Password != "" {
-					logrus.Debug("pulling with user/pass auth")
-					err = w.Pull(&git.PullOptions{RemoteName: "origin",
-						Auth: &http.BasicAuth{
-							Username: r.Username,
-							Password: r.Password,
-						}})
-				} else {
-					logrus.Debug("pulling with ssh private key")
-					err = w.Pull(&git.PullOptions{RemoteName: "origin"})
+				repository, err = r.newClone()
+				if err != nil {
+					logrus.Error("error during clone: ", err)
+					return
 				}
-				if err != nil && err != git.NoErrAlreadyUpToDate {
-					logrus.Debug(err)
-					repository, _ = r.newClone()
+			} else { // pulling
+				r.repository = repository
+				err = r.pull()
+				if err != nil {
+					logrus.Error(err)
+					repository, err = r.newClone()
+					if err != nil {
+						logrus.Error("error during pull and clone: ", err)
+						return
+					}
 				}
 			}
 		} else {
 			logrus.Debug("no repo found, cloning")
-			repository, _ = r.newClone()
+			repository, err = r.newClone()
+			if err != nil {
+				logrus.Error("error during clone: ", err)
+				return
+			}
 		}
 		r.repository = repository
+	} else {
+		err = r.pull()
+		if err != nil {
+			logrus.Error(err)
+			repository, err = r.newClone()
+			if err != nil {
+				logrus.Error("error during pull and clone: ", err)
+				return
+			}
+		}
+	}
+}
+
+func (r *Repo) setupAuth() {
+	if r.Username != "" && r.Password != "" {
+		logrus.Debug("repo.setupAuth: setting up username/password authentication for git client")
+		r.auth = &http.BasicAuth{
+			Username: r.Username,
+			Password: r.Password,
+		}
+	} else {
+		logrus.Debug("repo.setupAuth: attempting SSH authentication for git client")
+		s := filepath.Join(os.Getenv("HOME"), ".ssh", "id_rsa")
+		sshKey, err := ioutil.ReadFile(s)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"error":   err,
+				"keyPath": s,
+			}).Error("repo.setupAuth: failed to read ssh key")
+		}
+		signer, err := cryptossh.ParsePrivateKey(sshKey)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"error":   err,
+				"keyPath": s,
+			}).Error("repo.setupAuth: failed to parse ssh private key")
+		}
+		r.auth = &ssh.PublicKeys{User: "git", Signer: signer}
+	}
+}
+
+func (r *Repo) pull() error {
+	w, _ := r.repository.Worktree()
+
+	logrus.Info("pulling git changes")
+	err := w.Pull(&git.PullOptions{
+		Auth:       r.auth,
+		RemoteName: "origin"})
+
+	if err != nil && err != git.NoErrAlreadyUpToDate {
+		return err
+	} else {
+		return nil
 	}
 }
 
@@ -70,7 +135,7 @@ func (r *Repo) getManifests() []manifest.Manifest {
 	r.init()
 	ref, _ := r.repository.Head()
 	commit, _ := r.repository.CommitObject(ref.Hash())
-	logrus.Debug("last commit:", commit.Message)
+	logrus.Debug("repo.getManifests: last commit: ", commit.Message)
 
 	finalManifests, err := helm.ProcessTemplate(r.LocalPath + "/" + r.ChartPath) // because of filepath.abs in main, path is always without /
 	if err != nil {
@@ -101,18 +166,10 @@ func (r *Repo) CommitAndPushAll(msg string) error {
 			return err
 		}
 
-		if r.Username != "" && r.Password != "" {
-			logrus.Debug("pushing with user/password auth")
-			err = r.repository.Push(&git.PushOptions{
-				Auth: &http.BasicAuth{
-					Username: r.Username,
-					Password: r.Password,
-				},
-			})
-		} else {
-			logrus.Debug("pushing with ssh auth")
-			err = r.repository.Push(&git.PushOptions{})
-		}
+		logrus.Debug("repo.CommitAndPushAll: pushing git commit ", msg)
+		err = r.repository.Push(&git.PushOptions{
+			Auth: r.auth,
+		})
 		if err != nil {
 			return err
 		}
@@ -130,21 +187,11 @@ func (r *Repo) newClone() (*git.Repository, error) {
 		logrus.Warn(err)
 	}
 
-	if r.Username != "" && r.Password != "" {
-		logrus.Debug("cloning with user/password auth")
-		return git.PlainClone(r.LocalPath, false, &git.CloneOptions{
-			Auth: &http.BasicAuth{
-				Username: r.Username,
-				Password: r.Password,
-			},
-			URL: r.URL,
-		})
-	} else {
-		logrus.Debug("cloning with ssh auth")
-		return git.PlainClone(r.LocalPath, false, &git.CloneOptions{
-			URL: r.URL,
-		})
-	}
+	logrus.Debug("cloning git repo")
+	return git.PlainClone(r.LocalPath, false, &git.CloneOptions{
+		Auth: r.auth,
+		URL:  r.URL,
+	})
 }
 
 func (r *Repo) GrepAndReplace(oldImage string, newTag string) {

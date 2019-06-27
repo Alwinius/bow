@@ -291,11 +291,10 @@ func (p *Provider) updateDeployments(plans []*UpdatePlan) (updated []*k8s.Generi
 			parts := strings.Split(img, ":")
 			if len(parts) > 1 && parts[1] == plan.CurrentVersion { // images without a tag will be ignored
 				p.repo.GrepAndReplace(img, plan.NewVersion)
-				err := p.repo.CommitAndPushAll("updating " + img + " to version " + plan.NewVersion)
+				err := p.repo.CommitAndPushAll("updating " + img + " to " + plan.NewVersion)
 				if err != nil {
 					log.WithFields(log.Fields{
 						"error":      err,
-						"namespace":  resource.Namespace,
 						"deployment": resource.Name,
 						"kind":       resource.Kind(),
 						"update":     fmt.Sprintf("%s->%s", plan.CurrentVersion, plan.NewVersion),
@@ -309,10 +308,9 @@ func (p *Provider) updateDeployments(plans []*UpdatePlan) (updated []*k8s.Generi
 		err = p.updateComplete(plan)
 		if err != nil {
 			log.WithFields(log.Fields{
-				"error":     err,
-				"name":      resource.Name,
-				"kind":      resource.Kind(),
-				"namespace": resource.Namespace,
+				"error": err,
+				"name":  resource.Name,
+				"kind":  resource.Kind(),
 			}).Warn("provider.kubernetes: got error while resetting approvals counter after successful update")
 		}
 

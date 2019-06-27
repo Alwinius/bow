@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  keel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DEBUG: 1
+      REPO_CHART_PATH: helm/petclinic
+      REPO_URL: git@iteragit.iteratec.de:bachelors-thesis-aeb/petclinic-deployment.git
+    volumes:
+      - "/home/alwin/.ssh/id_rsa:/root/.ssh/id_rsa"
+      - "/home/alwin/.ssh/known_hosts:/root/known_hosts"

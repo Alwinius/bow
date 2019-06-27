@@ -100,7 +100,7 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	dataDir := "/home/alwin"
+	dataDir := "/data"
 	if os.Getenv(EnvDataDir) != "" {
 		dataDir = os.Getenv(EnvDataDir)
 	}
@@ -163,6 +163,7 @@ func main() {
 	wl := log.WithField("context", "watch")
 
 	absRepoPath, _ := filepath.Abs(repoPath)
+	log.Debug("main: using repository from ", os.Getenv(EnvRepoURL))
 	repo := gitrepo.Repo{Username: os.Getenv(EnvRepoUser), Password: os.Getenv(EnvRepoPassword), URL: os.Getenv(EnvRepoURL), ChartPath: os.Getenv(EnvRepoChartPath), LocalPath: absRepoPath}
 	gitrepo.WatchRepo(&g, repo, wl, buf)
 

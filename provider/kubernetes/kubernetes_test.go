@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/cache/memory"
 	"github.com/alwinius/keel/extension/notification"
 	"github.com/alwinius/keel/internal/k8s"
 	"github.com/alwinius/keel/types"
