@@ -8,6 +8,10 @@ services:
       DEBUG: 1
       REPO_CHART_PATH: helm/petclinic
       REPO_URL: git@iteragit.iteratec.de:bachelors-thesis-aeb/petclinic-deployment.git
+      BASIC_AUTH_USER: alwin
+      BASIC_AUTH_PASSWORD: "123"
+    ports:
+      - 9300:9300
     volumes:
       - "/home/alwin/.ssh/id_rsa:/root/.ssh/id_rsa"
-      - "/home/alwin/.ssh/known_hosts:/root/known_hosts"
+      - "/home/alwin/.ssh/known_hosts:/root/.ssh/known_hosts"

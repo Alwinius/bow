@@ -16,17 +16,19 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
 type Repo struct {
-	ChartPath  string
-	Username   string
-	Password   string
-	URL        string
-	LocalPath  string
-	auth       transport.AuthMethod
-	repository *git.Repository
+	ChartPath      string
+	Username       string
+	Password       string
+	URL            string
+	LocalPath      string
+	auth           transport.AuthMethod
+	repository     *git.Repository
+	fileAccessLock sync.Mutex
 }
 
 const committerName = "Keel.sh"
@@ -35,6 +37,8 @@ const committerEMail = "admin@example.com"
 func (r *Repo) init() {
 	var repository *git.Repository
 	var err error
+	r.fileAccessLock.Lock()
+	defer r.fileAccessLock.Unlock()
 	if r.repository == nil {
 		r.setupAuth()
 
@@ -147,6 +151,8 @@ func (r *Repo) getManifests() []manifest.Manifest {
 
 func (r *Repo) CommitAndPushAll(msg string) error {
 	r.init()
+	r.fileAccessLock.Lock()
+	defer r.fileAccessLock.Unlock()
 	w, err := r.repository.Worktree()
 	if err != nil {
 		return err
@@ -196,6 +202,8 @@ func (r *Repo) newClone() (*git.Repository, error) {
 
 func (r *Repo) GrepAndReplace(oldImage string, newTag string) {
 	r.init()
+	r.fileAccessLock.Lock()
+	defer r.fileAccessLock.Unlock()
 	ref, err := image.Parse(oldImage)
 
 	err = filepath.Walk(r.LocalPath,
