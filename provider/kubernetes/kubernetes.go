@@ -258,6 +258,10 @@ func (p *Provider) processEvent(event *types.Event) (updated []*k8s.GenericResou
 
 func (p *Provider) updateDeployments(plans []*UpdatePlan) (updated []*k8s.GenericResource, err error) {
 	for _, plan := range plans {
+		if plan.CurrentVersion == plan.NewVersion {
+			continue
+		}
+
 		resource := plan.Resource
 
 		annotations := resource.GetAnnotations()
