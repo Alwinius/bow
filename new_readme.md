@@ -17,6 +17,8 @@ populated from a secret
 - to access private docker registries, a full dockercfg can be passed in DOCKER_REGISTRY_CFG
 - REPO_USERNAME and _PASSWORD or a private key and known_hosts need to be provided in any case, otherwise
 keel cannot push anyway
+- provide path to Helm chart home as you would for `helm template` from the git repos home with
+REPO_CHART_PATH
 
 ## Development
 - make sure to download dependencies with `dep ensure`
@@ -24,3 +26,18 @@ keel cannot push anyway
 - or build using Docker `docker-compose build`
 - run generated binary or Docker image `docker-compose up -d`
 - to test kubernetes, push new image to registry and change path in `deployment/deployment-norbac.yaml`
+
+## Features confirmed working (in some limited way)
+- webhook triggers
+- approvals
+- chat notifications
+- Docker registry secret from env
+- running from binary, in Docker container and k8s cluster
+- web frontend (set BASIC_AUTH_USER and BASIC_AUTH_PASSWORD to enable)
+- git authentication with username/password or private key
+- polling enabled by default (different to Keel)
+
+### Roadmap
+- allow selecting git branch
+- test semver support
+- bug fixes - tell me about bugs
