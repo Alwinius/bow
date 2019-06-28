@@ -7,6 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 	cryptossh "golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/config"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
@@ -29,6 +31,7 @@ type Repo struct {
 	auth           transport.AuthMethod
 	repository     *git.Repository
 	fileAccessLock sync.Mutex
+	Branch         plumbing.ReferenceName
 }
 
 const committerName = "Keel.sh"
@@ -122,13 +125,25 @@ func (r *Repo) setupAuth() {
 
 func (r *Repo) pull() error {
 	w, _ := r.repository.Worktree()
-
 	logrus.Info("pulling git changes")
+
 	err := w.Pull(&git.PullOptions{
-		Auth:       r.auth,
-		RemoteName: "origin"})
+		Auth:          r.auth,
+		Force:         true,
+		RemoteName:    "origin",
+		ReferenceName: r.Branch,
+	})
 
 	if err != nil && err != git.NoErrAlreadyUpToDate {
+		return err
+	}
+
+	err = w.Checkout(&git.CheckoutOptions{
+		Branch: r.Branch,
+		Force:  true,
+	})
+
+	if err != nil {
 		return err
 	} else {
 		return nil
@@ -150,7 +165,6 @@ func (r *Repo) getManifests() []manifest.Manifest {
 }
 
 func (r *Repo) CommitAndPushAll(msg string) error {
-	r.init()
 	r.fileAccessLock.Lock()
 	defer r.fileAccessLock.Unlock()
 	w, err := r.repository.Worktree()
@@ -158,7 +172,10 @@ func (r *Repo) CommitAndPushAll(msg string) error {
 		return err
 	}
 
-	changes, _ := w.Status()
+	changes, err := w.Status()
+	if err != nil {
+		return err
+	}
 	if len(changes) > 0 {
 		_, err = w.Commit(msg, &git.CommitOptions{
 			All: true,
@@ -179,6 +196,8 @@ func (r *Repo) CommitAndPushAll(msg string) error {
 		if err != nil {
 			return err
 		}
+	} else {
+		logrus.Error("repo.CommitAndPushAll: no files changed ", msg)
 	}
 	return nil
 }
@@ -194,10 +213,20 @@ func (r *Repo) newClone() (*git.Repository, error) {
 	}
 
 	logrus.Debug("cloning git repo")
-	return git.PlainClone(r.LocalPath, false, &git.CloneOptions{
-		Auth: r.auth,
-		URL:  r.URL,
+	c, err := git.PlainClone(r.LocalPath, false, &git.CloneOptions{
+		Auth:          r.auth,
+		URL:           r.URL,
+		ReferenceName: r.Branch,
 	})
+	if err != nil {
+		return c, err
+	}
+
+	err = c.Fetch(&git.FetchOptions{
+		RefSpecs: []config.RefSpec{"refs/*:refs/*", "HEAD:refs/heads/HEAD"},
+		Auth:     r.auth,
+	})
+	return c, err
 }
 
 func (r *Repo) GrepAndReplace(oldImage string, newTag string) {

@@ -10,6 +10,7 @@ services:
       REPO_URL: git@iteragit.iteratec.de:bachelors-thesis-aeb/petclinic-deployment.git
       BASIC_AUTH_USER: alwin
       BASIC_AUTH_PASSWORD: "123"
+      REPO_BRANCH: dev
     ports:
       - 9300:9300
     volumes:

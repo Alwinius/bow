@@ -16,6 +16,7 @@ import (
 
 	"github.com/alwinius/keel/approvals"
 	"github.com/alwinius/keel/bot"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 
 	// "github.com/alwinius/keel/cache/memory"
 	"github.com/alwinius/keel/pkg/auth"
@@ -68,6 +69,7 @@ const (
 	EnvRepoUser          = "REPO_USERNAME"   // optional
 	EnvRepoPassword      = "REPO_PASSWORD"   // optional
 	EnvRepoChartPath     = "REPO_CHART_PATH" // optional
+	EnvRepoBranch        = "REPO_BRANCH"     // optional
 
 	// EnvDefaultDockerRegistryCfg - default registry configuration that can be passed into
 	// keel for polling trigger
@@ -163,8 +165,16 @@ func main() {
 	wl := log.WithField("context", "watch")
 
 	absRepoPath, _ := filepath.Abs(repoPath)
-	log.Debug("main: using repository from ", os.Getenv(EnvRepoURL))
-	repo := gitrepo.Repo{Username: os.Getenv(EnvRepoUser), Password: os.Getenv(EnvRepoPassword), URL: os.Getenv(EnvRepoURL), ChartPath: os.Getenv(EnvRepoChartPath), LocalPath: absRepoPath}
+
+	b := os.Getenv(EnvRepoBranch)
+	if b == "" {
+		b = "master"
+	}
+	branch := plumbing.NewBranchReferenceName(b)
+
+	log.Debug("main: using branch ", branch, " from ", os.Getenv(EnvRepoURL))
+	repo := gitrepo.Repo{Username: os.Getenv(EnvRepoUser), Password: os.Getenv(EnvRepoPassword), URL: os.Getenv(EnvRepoURL),
+		ChartPath: os.Getenv(EnvRepoChartPath), LocalPath: absRepoPath, Branch: branch}
 	gitrepo.WatchRepo(&g, repo, wl, buf)
 
 	// approvalsCache := memory.NewMemoryCache()

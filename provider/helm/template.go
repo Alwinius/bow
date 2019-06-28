@@ -23,7 +23,6 @@ import (
 	"k8s.io/helm/pkg/proto/hapi/chart"
 	"k8s.io/helm/pkg/renderutil"
 	"k8s.io/helm/pkg/timeconv"
-	"os"
 	"path/filepath"
 )
 
@@ -31,18 +30,9 @@ var defaultKubeVersion = fmt.Sprintf("%s.%s", chartutil.DefaultKubeVersion.Major
 
 func ProcessTemplate(path string) ([]manifest.Manifest, error) {
 	chartPath, _ := filepath.Abs(path)
-	var outputDir string
 	namespace := "default"
 	var vFiles = valueFiles{path + "/values.yaml"}
 	releaseName := "whatever" // the release is needed to process the templates, but it does not have an effect on the images
-
-	// verify that output-dir exists if provided
-	if outputDir != "" {
-		_, err := os.Stat(outputDir)
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("output-dir '%s' does not exist", outputDir)
-		}
-	}
 
 	// get combined values and create config
 	rawVals, err := vals(vFiles, "", "", "")
