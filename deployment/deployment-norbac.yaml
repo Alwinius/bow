@@ -1,22 +1,22 @@
 ---
-# Source: keel/templates/00-namespace.yaml
+# Source: bow/templates/00-namespace.yaml
 
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: "keel"
+  name: "bow"
 ---
-# Source: keel/templates/service.yaml
+# Source: bow/templates/service.yaml
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: keel
-  namespace: keel
+  name: bow
+  namespace: bow
   labels:
-    app: keel
-    chart: keel-0.7.0
-    release: keel
+    app: bow
+    chart: bow-0.7.0
+    release: bow
     heritage: Tiller
 spec:
   type: LoadBalancer
@@ -24,45 +24,45 @@ spec:
     - port: 9300
       targetPort: 9300
       protocol: TCP
-      name: keel
+      name: bow
   selector:
-    app: keel
+    app: bow
   sessionAffinity: None
 
 ---
-# Source: keel/templates/deployment.yaml
+# Source: bow/templates/deployment.yaml
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: keel
-  namespace: keel
+  name: bow
+  namespace: bow
   labels:
-    app: keel
-    chart: keel-0.7.0
-    release: keel
+    app: bow
+    chart: bow-0.7.0
+    release: bow
     heritage: Tiller
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: keel
-      release: keel
+      app: bow
+      release: bow
   template:
     metadata:
       labels:
-        app: keel
-        release: keel
+        app: bow
+        release: bow
     spec:
       volumes:
         - name: secret-volume
           secret:
             secretName: ssh-key-secret
       containers:
-        - name: keel
+        - name: bow
           # Note that we use appVersion to get images tag.
-          image: "alwin2/keel"
+          image: "alwin2/bow"
           imagePullPolicy: Always
-          command: ["/bin/keel"]
+          command: ["/bin/bow"]
           volumeMounts:
             - name: secret-volume
               readOnly: true

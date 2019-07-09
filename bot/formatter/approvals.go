@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 )
 
 // Formatter headers

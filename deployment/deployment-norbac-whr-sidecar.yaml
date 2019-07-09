@@ -1,36 +1,36 @@
 ---
-# Source: keel/templates/00-namespace.yaml
+# Source: bow/templates/00-namespace.yaml
 
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: "keel"
+  name: "bow"
 
 ---
-# Source: keel/templates/service-account.yaml
+# Source: bow/templates/service-account.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: keel
-  namespace: keel
+  name: bow
+  namespace: bow
   labels:
-    app: keel
-    chart: keel-0.7.0
-    release: keel
+    app: bow
+    chart: bow-0.7.0
+    release: bow
     heritage: Tiller
 
 ---
-# Source: keel/templates/service.yaml
+# Source: bow/templates/service.yaml
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: keel
-  namespace: keel
+  name: bow
+  namespace: bow
   labels:
-    app: keel
-    chart: keel-0.7.0
-    release: keel
+    app: bow
+    chart: bow-0.7.0
+    release: bow
     heritage: Tiller
 spec:
   type: LoadBalancer
@@ -38,42 +38,42 @@ spec:
     - port: 9300
       targetPort: 9300
       protocol: TCP
-      name: keel
+      name: bow
   selector:
-    app: keel
+    app: bow
   sessionAffinity: None
 
 ---
-# Source: keel/templates/deployment.yaml
+# Source: bow/templates/deployment.yaml
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: keel
-  namespace: keel
+  name: bow
+  namespace: bow
   labels:
-    app: keel
-    chart: keel-0.7.0
-    release: keel
+    app: bow
+    chart: bow-0.7.0
+    release: bow
     heritage: Tiller
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: keel
-      release: keel
+      app: bow
+      release: bow
   template:
     metadata:
       labels:
-        app: keel
-        release: keel
+        app: bow
+        release: bow
     spec:
-      serviceAccountName: keel
+      serviceAccountName: bow
       containers:
-        - name: keel
+        - name: bow
           # Note that we use appVersion to get images tag.
-          image: "keelhq/keel:0.14.1"
+          image: "alwin2/bow:0.14.1"
           imagePullPolicy: IfNotPresent
-          command: ["/bin/keel"]
+          command: ["/bin/bow"]
           env:
             - name: NAMESPACE
               valueFrom:
@@ -145,12 +145,12 @@ spec:
             - name: KEY
               valueFrom:
                 secretKeyRef:
-                  name: keel-webhookrelay
+                  name: bow-webhookrelay
                   key: key
             - name: SECRET
               valueFrom:
                 secretKeyRef:
-                  name: keel-webhookrelay
+                  name: bow-webhookrelay
                   key: secret
             - name: BUCKET
               value: ""
@@ -164,36 +164,36 @@ spec:
             
 
 ---
-# Source: keel/templates/pod-disruption-budget.yaml
+# Source: bow/templates/pod-disruption-budget.yaml
 
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: keel
-  namespace: keel
+  name: bow
+  namespace: bow
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: keel
+      app: bow
 
 ---
-# Source: keel/templates/clusterrole.yaml
-
-
----
-# Source: keel/templates/clusterrolebinding.yaml
+# Source: bow/templates/clusterrole.yaml
 
 
 ---
-# Source: keel/templates/secrets-aws-ecr.yaml
+# Source: bow/templates/clusterrolebinding.yaml
 
 
 ---
-# Source: keel/templates/secrets-google.yaml
+# Source: bow/templates/secrets-aws-ecr.yaml
 
 
 ---
-# Source: keel/templates/secrets-webhookrelay.yaml
+# Source: bow/templates/secrets-google.yaml
+
+
+---
+# Source: bow/templates/secrets-webhookrelay.yaml
 
 

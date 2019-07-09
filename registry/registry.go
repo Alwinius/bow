@@ -100,7 +100,7 @@ func (c *DefaultClient) getRegistryClient(registryAddress, username, password st
 // Get - get repository
 func (c *DefaultClient) Get(opts Opts) (*Repository, error) {
 
-	// fallback to HTTP if the registry doesn't speak HTTPS https://github.com/alwinius/keel/issues/331
+	// fallback to HTTP if the registry doesn't speak HTTPS https://github.com/alwinius/bow/issues/331
 INIT_CLIENT:
 	hub, err := c.getRegistryClient(opts.Registry, opts.Username, opts.Password)
 	if err != nil {
@@ -128,7 +128,7 @@ func (c *DefaultClient) Digest(opts Opts) (string, error) {
 		return "", ErrTagNotSupplied
 	}
 
-	// fallback to HTTP if the registry doesn't speak HTTPS https://github.com/alwinius/keel/issues/331
+	// fallback to HTTP if the registry doesn't speak HTTPS https://github.com/alwinius/bow/issues/331
 INIT_CLIENT:
 	hub, err := c.getRegistryClient(opts.Registry, opts.Username, opts.Password)
 	if err != nil {

@@ -21,7 +21,7 @@ const (
 	AuditResourceKindWebhook  = "webhook"
 )
 
-// AuditLog - audit logs lets users basic things happening in keel such as
+// AuditLog - audit logs lets users basic things happening in bow such as
 // deployment updates and approval actions
 type AuditLog struct {
 	ID        string    `json:"id" gorm:"primary_key;type:varchar(36)"`

@@ -1,25 +1,25 @@
-# Keel - automated Kubernetes deployments for the rest of us
+# bow - automated Kubernetes deployments for the rest of us
 
-* Website [https://keel.sh](https://keel.sh)
-* User Guide [https://keel.sh/user-guide/](https://keel.sh/user-guide/)
+* Website [https://bow.sh](https://bow.sh)
+* User Guide [https://bow.sh/user-guide/](https://bow.sh/user-guide/)
 
-Keel is a tool for automating [Kubernetes](https://kubernetes.io/) deployment updates. Keel is stateless, robust and lightweight.
+bow is a tool for automating [Kubernetes](https://kubernetes.io/) deployment updates. bow is stateless, robust and lightweight.
 
-Keel provides several key features:
+bow provides several key features:
 
-* __[Kubernetes](https://kubernetes.io/) and [Helm](https://helm.sh) providers__ - Keel has direct integrations with Kubernetes and Helm.
+* __[Kubernetes](https://kubernetes.io/) and [Helm](https://helm.sh) providers__ - bow has direct integrations with Kubernetes and Helm.
 
-* __No CLI/API__ - tired of `***ctl` for everything? Keel doesn't have one. Gets job done through labels, annotations, charts.
+* __No CLI/API__ - tired of `***ctl` for everything? bow doesn't have one. Gets job done through labels, annotations, charts.
 
 * __Semver policies__ - specify update policy for each deployment/Helm release individually.
 
-* __Automatic [Google Container Registry](https://cloud.google.com/container-registry/) configuration__ - Keel automatically sets up topic and subscriptions for your deployment images by periodically scanning your environment.
+* __Automatic [Google Container Registry](https://cloud.google.com/container-registry/) configuration__ - bow automatically sets up topic and subscriptions for your deployment images by periodically scanning your environment.
 
-* __[Native, DockerHub and Quay webhooks](https://keel.sh/user-guide/triggers/#webhooks) support__ -  once webhook is received impacted deployments will be identified and updated.
+* __[Native, DockerHub and Quay webhooks](https://bow.sh/user-guide/triggers/#webhooks) support__ -  once webhook is received impacted deployments will be identified and updated.
 
-*  __[Polling](https://keel.sh/user-guide/#polling-deployment-example)__ - when webhooks and pubsub aren't available - Keel can still be useful by checking Docker Registry for new tags (if current tag is semver) or same tag SHA digest change (ie: `latest`).
+*  __[Polling](https://bow.sh/user-guide/#polling-deployment-example)__ - when webhooks and pubsub aren't available - bow can still be useful by checking Docker Registry for new tags (if current tag is semver) or same tag SHA digest change (ie: `latest`).
 
-* __Notifications__ - out of the box Keel has Slack and standard webhook notifications, more info [here](https://keel.sh/user-guide/#notifications)
+* __Notifications__ - out of the box bow has Slack and standard webhook notifications, more info [here](https://bow.sh/user-guide/#notifications)
 
 
 ## Installing
@@ -27,16 +27,16 @@ Keel provides several key features:
 Docker image _polling_, _Kubernetes provider_ and _Helm provider_ support are set by default, then Kubernetes _deployments_ can be upgraded when new Docker image is available:
 
 ```console
-$ helm upgrade --install keel --namespace keel keel/keel
+$ helm upgrade --install bow --namespace bow bow/bow
 ```
 
-### Setting up Helm release to be automatically updated by Keel
+### Setting up Helm release to be automatically updated by bow
 
 Add the following to your app's `values.yaml` file and do `helm upgrade ...`:
 
 ```
-keel:
-  # keel policy (all/major/minor/patch/force)
+bow:
+  # bow policy (all/major/minor/patch/force)
   policy: all
   # trigger type, defaults to events such as pubsub, webhooks
   trigger: poll
@@ -51,13 +51,13 @@ keel:
 The same can be applied with `--set` flag without using `values.yaml` file:
 
 ```console
-$ helm upgrade --install whd webhookdemo --namespace keel --reuse-values \
-  --set keel.policy="all",keel.trigger="poll",keel.pollSchedule="@every 3m" \
-  --set keel.images[0].repository="image.repository" \
-  --set keel.images[0].tag="image.tag"
+$ helm upgrade --install whd webhookdemo --namespace bow --reuse-values \
+  --set bow.policy="all",bow.trigger="poll",bow.pollSchedule="@every 3m" \
+  --set bow.images[0].repository="image.repository" \
+  --set bow.images[0].tag="image.tag"
 ```
 
-You can read in more details about supported policies, triggers and etc in the [User Guide](https://keel.sh/user-guide/).
+You can read in more details about supported policies, triggers and etc in the [User Guide](https://bow.sh/user-guide/).
 
 Also you should check the [Webhooh demo app](https://github.com/webhookrelay/webhook-demo) and it's chart to have more clear
 idea how to set automatic updates.
@@ -65,17 +65,17 @@ idea how to set automatic updates.
 
 ## Uninstalling the Chart
 
-To uninstall/delete the `keel` deployment:
+To uninstall/delete the `bow` deployment:
 
 ```console
-$ helm delete --purge keel
+$ helm delete --purge bow
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
 
 ## Configuration
 
-The following table lists has the main configurable parameters (polling, triggers, notifications, service) of the _Keel_ chart and they apply to both Kubernetes and Helm providers:
+The following table lists has the main configurable parameters (polling, triggers, notifications, service) of the _bow_ chart and they apply to both Kubernetes and Helm providers:
 
 | Parameter                                   | Description                            | Default                                                   |
 | ------------------------------------------- | -------------------------------------- | --------------------------------------------------------- |
@@ -96,10 +96,10 @@ The following table lists has the main configurable parameters (polling, trigger
 | `slack.token`                               | Slack token                            |                                                           |
 | `slack.channel`                             | Slack channel                          |                                                           |
 | `slack.approvalsChannel`                    | Slack channel for approvals            |                                                           |
-| `service.enable`                            | Enable/disable Keel service            | `false`                                                   |
-| `service.type`                              | Keel service type                      | `LoadBalancer`                                            |
-| `service.externalPort`                      | Keel service port                      | `9300`                                                    |
-| `service.clusterIP`                         | Keel service clusterIP                 |                                                           |
+| `service.enable`                            | Enable/disable bow service            | `false`                                                   |
+| `service.type`                              | bow service type                      | `LoadBalancer`                                            |
+| `service.externalPort`                      | bow service port                      | `9300`                                                    |
+| `service.clusterIP`                         | bow service clusterIP                 |                                                           |
 | `webhookRelay.enabled`                      | Enable/disable WebhookRelay integration| `false`                                                   |
 | `webhookRelay.key`                          | WebhookRelay key                       |                                                           |
 | `webhookRelay.secret`                       | WebhookRelay secret                    |                                                           |
@@ -135,6 +135,6 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart. For example,
 
 ```console
-$ helm install --name keel --namespace keel -f values.yaml keel/keel
+$ helm install --name bow --namespace bow -f values.yaml bow/bow
 ```
 > **Tip**: You can use the default [values.yaml](values.yaml)

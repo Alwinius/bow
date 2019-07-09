@@ -9,9 +9,9 @@ import (
 
 	"github.com/tbruyelle/hipchat-go/hipchat"
 
-	"github.com/alwinius/keel/constants"
-	"github.com/alwinius/keel/extension/notification"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/constants"
+	"github.com/alwinius/bow/extension/notification"
+	"github.com/alwinius/bow/types"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -37,7 +37,7 @@ func (s *sender) Configure(config *notification.Config) (bool, error) {
 	if os.Getenv(constants.EnvHipchatBotName) != "" {
 		s.botName = os.Getenv(constants.EnvHipchatBotName)
 	} else {
-		s.botName = "keel"
+		s.botName = "bow"
 	}
 
 	if os.Getenv(constants.EnvHipchatChannels) != "" {

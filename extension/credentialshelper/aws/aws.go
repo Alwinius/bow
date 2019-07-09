@@ -14,8 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
 
-	"github.com/alwinius/keel/extension/credentialshelper"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/extension/credentialshelper"
+	"github.com/alwinius/bow/types"
 
 	log "github.com/sirupsen/logrus"
 )

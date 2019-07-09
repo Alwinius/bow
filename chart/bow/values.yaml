@@ -1,9 +1,9 @@
-# Default values for keel.
+# Default values for bow.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 image:
-  repository: keelhq/keel
+  repository: alwin2/bow
   tag: 0.14.2
   pullPolicy: IfNotPresent
 
@@ -33,7 +33,7 @@ gcr:
 notificationLevel: info
 
 # AWS Elastic Container Registry
-# https://keel.sh/v1/guide/documentation.html#Polling-with-AWS-ECR
+# https://bow.sh/v1/guide/documentation.html#Polling-with-AWS-ECR
 ecr:
   enabled: false
   accessKeyId: ""
@@ -47,7 +47,7 @@ webhook:
   endpoint: ""
 
 # Slack Notification
-# bot name (default keel) must exist!
+# bot name (default bow) must exist!
 slack:
   enabled: false
   botName: ""
@@ -75,7 +75,7 @@ basicauth:
   user: ""
   password: ""
 
-# Keel service
+# bow service
 # Enable to receive webhooks from Docker registries
 service:
   enabled: false
@@ -84,14 +84,14 @@ service:
   clusterIP: ""
 
 # Webhook Relay service
-# If you don’t want to expose your Keel service, you can use https://webhookrelay.com/
-# which can deliver webhooks to your internal Keel service through Keel sidecar container.
+# If you don’t want to expose your bow service, you can use https://webhookrelay.com/
+# which can deliver webhooks to your internal bow service through bow sidecar container.
 webhookRelay:
   enabled: false
   bucket: ""
   # webhookrelay.com credentials
-  # Set the key and secret values here to create the keel-webhookrelay secret with this
-  # chart -or- leave key and secret blank and create the keel-webhookrelay secret separately.
+  # Set the key and secret values here to create the bow-webhookrelay secret with this
+  # chart -or- leave key and secret blank and create the bow-webhookrelay secret separately.
   key: ""
   secret: ""
   # webhookrelay docker image
@@ -100,11 +100,11 @@ webhookRelay:
     tag: latest
     pullPolicy: IfNotPresent
 
-# Keel self-update
-# uncomment lines below if you want Keel to automaticly
+# bow self-update
+# uncomment lines below if you want bow to automaticly
 # self-update to the latest release version
-keel:
-  # keel policy (all/major/minor/patch/force)
+bow:
+  # bow policy (all/major/minor/patch/force)
   policy: all
   # trigger type, defaults to events such as pubsub, webhooks
   trigger: poll
@@ -144,7 +144,7 @@ googleApplicationCredentials: ""
 debug: false
 
 # This is used by the static manifest generator in order to create a static
-# namespace manifest for the namespace that keel is being installed
+# namespace manifest for the namespace that bow is being installed
 # within. It should **not** be used if you are using Helm for deployment.
 createNamespaceResource: false
 

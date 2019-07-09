@@ -3,8 +3,8 @@ package http
 import (
 	"net/http"
 
-	"github.com/alwinius/keel/internal/k8s"
-	"github.com/alwinius/keel/internal/policy"
+	"github.com/alwinius/bow/internal/k8s"
+	"github.com/alwinius/bow/internal/policy"
 )
 
 type resource struct {

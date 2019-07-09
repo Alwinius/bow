@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alwinius/keel/constants"
+	"github.com/alwinius/bow/constants"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 
 	apps_v1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -35,7 +35,7 @@ var dockerHub0150Webhook = `{
 		"owner": "karolisr",
 		"is_official": false,
 		"is_private": false,
-		"name": "keel",
+		"name": "bow",
 		"namespace": "karolisr",
 		"star_count": 0,
 		"comment_count": 0,
@@ -51,23 +51,23 @@ func TestWebhooksSemverUpdate(t *testing.T) {
 	// defer close(ctx)
 	defer cancel()
 
-	// go startKeel(ctx)
-	keel := &KeelCmd{}
+	// go startbow(ctx)
+	bow := &bowCmd{}
 	go func() {
-		err := keel.Start(ctx)
+		err := bow.Start(ctx)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("failed to start Keel process")
+			}).Error("failed to start bow process")
 		}
 	}()
 
 	defer func() {
-		err := keel.Stop()
+		err := bow.Stop()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("failed to stop Keel process")
+			}).Error("failed to stop bow process")
 		}
 	}()
 
@@ -83,7 +83,7 @@ func TestWebhooksSemverUpdate(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "deployment-1",
 				Namespace:   testNamespace,
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 				Annotations: map[string]string{},
 			},
 			apps_v1.DeploymentSpec{
@@ -129,11 +129,11 @@ func TestWebhooksSemverUpdate(t *testing.T) {
 		}
 		resp, err := client.Do(req)
 		if err != nil {
-			t.Errorf("failed to make a webhook request to keel: %s", err)
+			t.Errorf("failed to make a webhook request to bow: %s", err)
 		}
 
 		if resp.StatusCode != 200 {
-			t.Errorf("unexpected webhook response from keel: %d", resp.StatusCode)
+			t.Errorf("unexpected webhook response from bow: %d", resp.StatusCode)
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -146,8 +146,8 @@ func TestWebhooksSemverUpdate(t *testing.T) {
 	})
 }
 
-// Test to ensure Keel doesn't try to be tolerant and parse integers as semver versions, for example
-// 45000 shouldn't become 45000.0.0 version (https://github.com/alwinius/keel/issues/296)
+// Test to ensure bow doesn't try to be tolerant and parse integers as semver versions, for example
+// 45000 shouldn't become 45000.0.0 version (https://github.com/alwinius/bow/issues/296)
 func TestWebhookHighIntegerUpdate(t *testing.T) {
 
 	// stop := make(chan struct{})
@@ -155,23 +155,23 @@ func TestWebhookHighIntegerUpdate(t *testing.T) {
 	// defer close(ctx)
 	defer cancel()
 
-	// go startKeel(ctx)
-	keel := &KeelCmd{}
+	// go startbow(ctx)
+	bow := &bowCmd{}
 	go func() {
-		err := keel.Start(ctx)
+		err := bow.Start(ctx)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("failed to start Keel process")
+			}).Error("failed to start bow process")
 		}
 	}()
 
 	defer func() {
-		err := keel.Stop()
+		err := bow.Stop()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("failed to stop Keel process")
+			}).Error("failed to stop bow process")
 		}
 	}()
 
@@ -187,7 +187,7 @@ func TestWebhookHighIntegerUpdate(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "deployment-1",
 				Namespace:   testNamespace,
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 				Annotations: map[string]string{},
 			},
 			apps_v1.DeploymentSpec{
@@ -239,7 +239,7 @@ func TestWebhookHighIntegerUpdate(t *testing.T) {
 				"owner": "karolisr",
 				"is_official": false,
 				"is_private": false,
-				"name": "keel",
+				"name": "bow",
 				"namespace": "karolisr",
 				"star_count": 0,
 				"comment_count": 0,
@@ -257,11 +257,11 @@ func TestWebhookHighIntegerUpdate(t *testing.T) {
 		}
 		resp, err := client.Do(req)
 		if err != nil {
-			t.Errorf("failed to make a webhook request to keel: %s", err)
+			t.Errorf("failed to make a webhook request to bow: %s", err)
 		}
 
 		if resp.StatusCode != 200 {
-			t.Errorf("unexpected webhook response from keel: %d", resp.StatusCode)
+			t.Errorf("unexpected webhook response from bow: %d", resp.StatusCode)
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -281,23 +281,23 @@ func TestApprovals(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// go startKeel(ctx)
-	keel := &KeelCmd{}
+	// go startbow(ctx)
+	bow := &bowCmd{}
 	go func() {
-		err := keel.Start(ctx)
+		err := bow.Start(ctx)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("failed to start Keel process")
+			}).Error("failed to start bow process")
 		}
 	}()
 
 	defer func() {
-		err := keel.Stop()
+		err := bow.Stop()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("failed to stop Keel process")
+			}).Error("failed to stop bow process")
 		}
 	}()
 
@@ -314,9 +314,9 @@ func TestApprovals(t *testing.T) {
 				Name:      "deployment-1",
 				Namespace: testNamespace,
 				Labels: map[string]string{
-					types.KeelPolicyLabel:           "all",
-					types.KeelMinimumApprovalsLabel: "1",
-					types.KeelApprovalDeadlineLabel: "5",
+					types.BowPolicyLabel:           "all",
+					types.BowMinimumApprovalsLabel: "1",
+					types.BowApprovalDeadlineLabel: "5",
 				},
 				Annotations: map[string]string{},
 			},
@@ -363,11 +363,11 @@ func TestApprovals(t *testing.T) {
 		}
 		resp, err := client.Do(req)
 		if err != nil {
-			t.Errorf("failed to make a webhook request to keel: %s", err)
+			t.Errorf("failed to make a webhook request to bow: %s", err)
 		}
 
 		if resp.StatusCode != 200 {
-			t.Errorf("unexpected webhook response from keel: %d", resp.StatusCode)
+			t.Errorf("unexpected webhook response from bow: %d", resp.StatusCode)
 		}
 
 		time.Sleep(2 * time.Second)
@@ -417,28 +417,28 @@ func TestApprovalsWithAuthentication(t *testing.T) {
 	username := "foobar"
 	password := "barfood"
 
-	// go startKeel(ctx)
-	keel := &KeelCmd{
+	// go startbow(ctx)
+	bow := &bowCmd{
 		env: []string{
 			fmt.Sprintf("%s=%s", constants.EnvBasicAuthUser, username),
 			fmt.Sprintf("%s=%s", constants.EnvBasicAuthPassword, password),
 		},
 	}
 	go func() {
-		err := keel.Start(ctx)
+		err := bow.Start(ctx)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("failed to start Keel process")
+			}).Error("failed to start bow process")
 		}
 	}()
 
 	defer func() {
-		err := keel.Stop()
+		err := bow.Stop()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-			}).Error("failed to stop Keel process")
+			}).Error("failed to stop bow process")
 		}
 	}()
 
@@ -455,9 +455,9 @@ func TestApprovalsWithAuthentication(t *testing.T) {
 				Name:      "dep-1-auth-test",
 				Namespace: testNamespace,
 				Labels: map[string]string{
-					types.KeelPolicyLabel:           "all",
-					types.KeelMinimumApprovalsLabel: "1",
-					types.KeelApprovalDeadlineLabel: "5",
+					types.BowPolicyLabel:           "all",
+					types.BowMinimumApprovalsLabel: "1",
+					types.BowApprovalDeadlineLabel: "5",
 				},
 				Annotations: map[string]string{},
 			},
@@ -504,11 +504,11 @@ func TestApprovalsWithAuthentication(t *testing.T) {
 		}
 		resp, err := client.Do(req)
 		if err != nil {
-			t.Errorf("failed to make a webhook request to keel: %s", err)
+			t.Errorf("failed to make a webhook request to bow: %s", err)
 		}
 
 		if resp.StatusCode != 200 {
-			t.Errorf("unexpected webhook response from keel: %d", resp.StatusCode)
+			t.Errorf("unexpected webhook response from bow: %d", resp.StatusCode)
 		}
 
 		time.Sleep(2 * time.Second)

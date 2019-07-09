@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/alwinius/keel/provider/helm"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
-	testutil "github.com/alwinius/keel/util/testing"
+	"github.com/alwinius/bow/provider/helm"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
+	testutil "github.com/alwinius/bow/util/testing"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -93,7 +93,7 @@ func TestGetDockerConfigJSONSecret(t *testing.T) {
 		t.Errorf("failed to get creds: %s", err)
 	}
 
-	if creds.Username != "keeluser+keeltest" {
+	if creds.Username != "bowuser+bowtest" {
 		t.Errorf("unexpected username: %s", creds.Username)
 	}
 

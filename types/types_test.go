@@ -95,17 +95,17 @@ func TestParseEventNotificationChannels(t *testing.T) {
 		},
 		{
 			name: "one chan",
-			args: args{map[string]string{KeelNotificationChanAnnotation: "verychan"}},
+			args: args{map[string]string{bowNotificationChanAnnotation: "verychan"}},
 			want: []string{"verychan"},
 		},
 		{
 			name: "two chans with space",
-			args: args{map[string]string{KeelNotificationChanAnnotation: "verychan, corp"}},
+			args: args{map[string]string{bowNotificationChanAnnotation: "verychan, corp"}},
 			want: []string{"verychan", "corp"},
 		},
 		{
 			name: "two chans no space",
-			args: args{map[string]string{KeelNotificationChanAnnotation: "verychan,corp"}},
+			args: args{map[string]string{bowNotificationChanAnnotation: "verychan,corp"}},
 			want: []string{"verychan", "corp"},
 		},
 	}
@@ -143,7 +143,7 @@ func TestParseReleaseNotesURL(t *testing.T) {
 			name: "link",
 			args: args{
 				annotations: map[string]string{
-					KeelReleaseNotesURL: "http://link",
+					bowReleaseNotesURL: "http://link",
 				},
 			},
 			want: "http://link",

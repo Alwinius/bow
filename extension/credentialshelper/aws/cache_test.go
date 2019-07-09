@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 
 	"testing"
 )

@@ -12,9 +12,9 @@ import (
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 
-	"github.com/alwinius/keel/provider"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/provider"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 
 	log "github.com/sirupsen/logrus"
 )

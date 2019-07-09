@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 
 	"github.com/prometheus/client_golang/prometheus"
 

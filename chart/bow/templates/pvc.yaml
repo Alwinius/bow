@@ -2,10 +2,10 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ include "keel.fullname" . }}
+  name: {{ include "bow.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "keel.name" . }}
-    helm.sh/chart: {{ include "keel.chart" . }}
+    app.kubernetes.io/name: {{ include "bow.name" . }}
+    helm.sh/chart: {{ include "bow.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:

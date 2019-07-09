@@ -1,9 +1,9 @@
 package helm
 
 import (
-	"github.com/alwinius/keel/internal/policy"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/internal/policy"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 
 	hapi_chart "k8s.io/helm/pkg/proto/hapi/chart"
 
@@ -37,7 +37,7 @@ func checkRelease(repo *types.Repository, namespace, name string, chart *hapi_ch
 		return
 	}
 
-	keelCfg, err := getKeelConfig(vals)
+	bowCfg, err := getbowConfig(vals)
 	if err != nil {
 		if err == ErrPolicyNotSpecified {
 			// nothing to do
@@ -45,19 +45,19 @@ func checkRelease(repo *types.Repository, namespace, name string, chart *hapi_ch
 		}
 		log.WithFields(log.Fields{
 			"error": err,
-		}).Error("provider.helm: failed to get keel configuration for release")
-		// ignoring this release, no keel config found
+		}).Error("provider.helm: failed to get bow configuration for release")
+		// ignoring this release, no bow config found
 		return plan, false, nil
 	}
-	log.Infof("policy for release %s/%s parsed: %s", namespace, name, keelCfg.Plc.Name())
+	log.Infof("policy for release %s/%s parsed: %s", namespace, name, bowCfg.Plc.Name())
 
-	if keelCfg.Plc.Type() == policy.PolicyTypeNone {
+	if bowCfg.Plc.Type() == policy.PolicyTypeNone {
 		// policy is not set, ignoring release
 		return plan, false, nil
 	}
 
 	// checking for impacted images
-	for _, imageDetails := range keelCfg.Images {
+	for _, imageDetails := range bowCfg.Images {
 		imageRef, err := parseImage(vals, &imageDetails)
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -76,7 +76,7 @@ func checkRelease(repo *types.Repository, namespace, name string, chart *hapi_ch
 			continue
 		}
 
-		shouldUpdate, err := keelCfg.Plc.ShouldUpdate(imageRef.Tag(), eventRepoRef.Tag())
+		shouldUpdate, err := bowCfg.Plc.ShouldUpdate(imageRef.Tag(), eventRepoRef.Tag())
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error":           err,
@@ -90,16 +90,16 @@ func checkRelease(repo *types.Repository, namespace, name string, chart *hapi_ch
 			log.WithFields(log.Fields{
 				"parsed_image_name": imageRef.Remote(),
 				"target_image_name": repo.Name,
-				"policy":            keelCfg.Plc.Name(),
+				"policy":            bowCfg.Plc.Name(),
 			}).Info("provider.helm: ignoring")
 			continue
 		}
 
-		// if keelCfg.MatchTag && imageRef.Tag() != eventRepoRef.Tag() {
+		// if bowCfg.MatchTag && imageRef.Tag() != eventRepoRef.Tag() {
 		// 	log.WithFields(log.Fields{
 		// 		"parsed_image_name": imageRef.Remote(),
 		// 		"target_image_name": repo.Name,
-		// 		"policy":            keelCfg.Policy.String(),
+		// 		"policy":            bowCfg.Policy.String(),
 		// 	}).Info("provider.helm: match tag set but tags do not match, ignoring")
 		// 	continue
 		// }
@@ -116,7 +116,7 @@ func checkRelease(repo *types.Repository, namespace, name string, chart *hapi_ch
 		plan.Values[path] = value
 		plan.NewVersion = repo.Tag
 		plan.CurrentVersion = imageRef.Tag()
-		plan.Config = keelCfg
+		plan.Config = bowCfg
 		shouldUpdateRelease = true
 		if imageDetails.ReleaseNotes != "" {
 			plan.ReleaseNotes = append(plan.ReleaseNotes, imageDetails.ReleaseNotes)

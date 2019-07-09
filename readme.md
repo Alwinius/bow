@@ -1,8 +1,11 @@
 
-# Getting started
+# Bow
+
+
+## Getting started
 
 - create secret to use for git auth  
-`kubectl -n keel create secret generic ssh-key-secret --from-file=/home/alwin/.ssh/petclinic-deploy --from-file=/home/alwin/.ssh/petclinic-deploy.pub --from-file=/home/alwin/.ssh/known_hosts`
+`kubectl -n bow create secret generic ssh-key-secret --from-file=/home/alwin/.ssh/petclinic-deploy --from-file=/home/alwin/.ssh/petclinic-deploy.pub --from-file=/home/alwin/.ssh/known_hosts`
 - check and adapt `deployment/deployment-norbac.yaml`
     - specifically set REPO_ environment variables
 - apply yaml `kubectl apply -f deployment/deployment-norbac.yaml`
@@ -16,14 +19,15 @@
 populated from a secret
 - to access private docker registries, a full dockercfg can be passed in DOCKER_REGISTRY_CFG
 - REPO_USERNAME and _PASSWORD or a private key and known_hosts need to be provided in any case, otherwise
-keel cannot push anyway
+bow cannot push anyway
 - provide path to Helm chart home as you would for `helm template` from the git repos home with
 REPO_CHART_PATH
 - use REPO_BRANCH to update different and watch branch different to master
+- you have to use annotations like `bow/pollSchedule` instead of `keel.sh/pollSchedule`
 
 ## Development
 - make sure to download dependencies with `dep ensure`
-- manually build `cmd/keel/main.go`
+- manually build `cmd/bow/main.go`
 - or build using Docker `docker-compose build`
 - run generated binary or Docker image `docker-compose up -d`
 - to test kubernetes, push new image to registry and change path in `deployment/deployment-norbac.yaml`
@@ -41,7 +45,6 @@ REPO_CHART_PATH
 ### Roadmap
 - test semver support
 - bug fixes - tell me about bugs
-- rename project?
 
 ## Limitations
 - image name including tag needs to appear somewhere - don't move only the tag to values.yml

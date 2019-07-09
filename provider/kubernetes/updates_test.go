@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alwinius/keel/internal/k8s"
-	"github.com/alwinius/keel/internal/policy"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/timeutil"
+	"github.com/alwinius/bow/internal/k8s"
+	"github.com/alwinius/bow/internal/policy"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/timeutil"
 
 	apps_v1 "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"
@@ -54,7 +54,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+						Labels:      map[string]string{types.BowPolicyLabel: "all"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -82,7 +82,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+						Labels:      map[string]string{types.BowPolicyLabel: "all"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -119,7 +119,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+						Labels:      map[string]string{types.BowPolicyLabel: "all"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -153,10 +153,10 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:      "dep-1",
 						Namespace: "xxxx",
 						Annotations: map[string]string{
-							types.KeelPollScheduleAnnotation: types.KeelPollDefaultSchedule,
+							types.BowPollScheduleAnnotation: types.BowPollDefaultSchedule,
 						},
 						Labels: map[string]string{
-							types.KeelPolicyLabel: "all",
+							types.BowPolicyLabel: "all",
 						},
 					},
 					apps_v1.DeploymentSpec{
@@ -183,14 +183,14 @@ func TestProvider_checkForUpdate(t *testing.T) {
 			name: "dockerhub short image name ",
 			args: args{
 				policy: policy.NewForcePolicy(false),
-				repo:   &types.Repository{Name: "karolisr/keel", Tag: "0.2.0"},
+				repo:   &types.Repository{Name: "karolisr/bow", Tag: "0.2.0"},
 				resource: MustParseGR(&apps_v1.Deployment{
 					meta_v1.TypeMeta{},
 					meta_v1.ObjectMeta{
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "force"},
+						Labels:      map[string]string{types.BowPolicyLabel: "force"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -202,7 +202,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "karolisr/keel:latest",
+										Image: "karolisr/bow:latest",
 									},
 								},
 							},
@@ -218,7 +218,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "force"},
+						Labels:      map[string]string{types.BowPolicyLabel: "force"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -230,7 +230,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "karolisr/keel:0.2.0",
+										Image: "karolisr/bow:0.2.0",
 									},
 								},
 							},
@@ -248,14 +248,14 @@ func TestProvider_checkForUpdate(t *testing.T) {
 			name: "poll trigger, same tag",
 			args: args{
 				policy: policy.NewForcePolicy(false),
-				repo:   &types.Repository{Name: "karolisr/keel", Tag: "master"},
+				repo:   &types.Repository{Name: "karolisr/bow", Tag: "master"},
 				resource: MustParseGR(&apps_v1.Deployment{
 					meta_v1.TypeMeta{},
 					meta_v1.ObjectMeta{
 						Name:        "dep-1",
 						Namespace:   "xxxx",
-						Annotations: map[string]string{types.KeelPollScheduleAnnotation: types.KeelPollDefaultSchedule},
-						Labels:      map[string]string{types.KeelPolicyLabel: "force"},
+						Annotations: map[string]string{types.BowPollScheduleAnnotation: types.BowPollDefaultSchedule},
+						Labels:      map[string]string{types.BowPolicyLabel: "force"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -267,7 +267,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "karolisr/keel:master",
+										Image: "karolisr/bow:master",
 									},
 								},
 							},
@@ -283,9 +283,9 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:      "dep-1",
 						Namespace: "xxxx",
 						Annotations: map[string]string{
-							types.KeelPollScheduleAnnotation: types.KeelPollDefaultSchedule,
+							types.BowPollScheduleAnnotation: types.BowPollDefaultSchedule,
 						},
-						Labels: map[string]string{types.KeelPolicyLabel: "force"},
+						Labels: map[string]string{types.BowPolicyLabel: "force"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -297,7 +297,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "karolisr/keel:master",
+										Image: "karolisr/bow:master",
 									},
 								},
 							},
@@ -316,15 +316,15 @@ func TestProvider_checkForUpdate(t *testing.T) {
 			name: "pubsub trigger, force-match, same tag",
 			args: args{
 				policy: policy.NewForcePolicy(false),
-				repo:   &types.Repository{Name: "karolisr/keel", Tag: "latest-staging"},
+				repo:   &types.Repository{Name: "karolisr/bow", Tag: "latest-staging"},
 				resource: MustParseGR(&apps_v1.Deployment{
 					meta_v1.TypeMeta{},
 					meta_v1.ObjectMeta{
 						Name:      "dep-1",
 						Namespace: "xxxx",
 						Labels: map[string]string{
-							types.KeelPolicyLabel:        "force",
-							types.KeelForceTagMatchLabel: "true",
+							types.BowPolicyLabel:        "force",
+							types.BowForceTagMatchLabel: "true",
 						},
 					},
 					apps_v1.DeploymentSpec{
@@ -337,7 +337,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "karolisr/keel:latest-staging",
+										Image: "karolisr/bow:latest-staging",
 									},
 								},
 							},
@@ -353,8 +353,8 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:      "dep-1",
 						Namespace: "xxxx",
 						Labels: map[string]string{
-							types.KeelForceTagMatchLabel: "true",
-							types.KeelPolicyLabel:        "force",
+							types.BowForceTagMatchLabel: "true",
+							types.BowPolicyLabel:        "force",
 						},
 					},
 					apps_v1.DeploymentSpec{
@@ -367,7 +367,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "karolisr/keel:latest-staging",
+										Image: "karolisr/bow:latest-staging",
 									},
 								},
 							},
@@ -386,15 +386,15 @@ func TestProvider_checkForUpdate(t *testing.T) {
 			name: "pubsub trigger, force-match, same tag on eu.gcr.io",
 			args: args{
 				policy: policy.NewForcePolicy(false),
-				repo:   &types.Repository{Host: "eu.gcr.io", Name: "karolisr/keel", Tag: "latest-staging"},
+				repo:   &types.Repository{Host: "eu.gcr.io", Name: "karolisr/bow", Tag: "latest-staging"},
 				resource: MustParseGR(&apps_v1.Deployment{
 					meta_v1.TypeMeta{},
 					meta_v1.ObjectMeta{
 						Name:      "dep-1",
 						Namespace: "xxxx",
 						Labels: map[string]string{
-							types.KeelPolicyLabel:        "force",
-							types.KeelForceTagMatchLabel: "true",
+							types.BowPolicyLabel:        "force",
+							types.BowForceTagMatchLabel: "true",
 						},
 					},
 					apps_v1.DeploymentSpec{
@@ -407,7 +407,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "eu.gcr.io/karolisr/keel:latest-staging",
+										Image: "eu.gcr.io/karolisr/bow:latest-staging",
 									},
 								},
 							},
@@ -423,8 +423,8 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:      "dep-1",
 						Namespace: "xxxx",
 						Labels: map[string]string{
-							types.KeelForceTagMatchLabel: "true",
-							types.KeelPolicyLabel:        "force",
+							types.BowForceTagMatchLabel: "true",
+							types.BowPolicyLabel:        "force",
 						},
 					},
 					apps_v1.DeploymentSpec{
@@ -438,7 +438,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "eu.gcr.io/karolisr/keel:latest-staging",
+										Image: "eu.gcr.io/karolisr/bow:latest-staging",
 									},
 								},
 							},
@@ -456,15 +456,15 @@ func TestProvider_checkForUpdate(t *testing.T) {
 			name: "pubsub trigger, force-match, different tag",
 			args: args{
 				policy: policy.NewForcePolicy(true),
-				repo:   &types.Repository{Name: "karolisr/keel", Tag: "latest-staging"},
+				repo:   &types.Repository{Name: "karolisr/bow", Tag: "latest-staging"},
 				resource: MustParseGR(&apps_v1.Deployment{
 					meta_v1.TypeMeta{},
 					meta_v1.ObjectMeta{
 						Name:      "dep-1",
 						Namespace: "xxxx",
 						Labels: map[string]string{
-							types.KeelPolicyLabel:        "force",
-							types.KeelForceTagMatchLabel: "true",
+							types.BowPolicyLabel:        "force",
+							types.BowForceTagMatchLabel: "true",
 						},
 					},
 					apps_v1.DeploymentSpec{
@@ -472,7 +472,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "karolisr/keel:latest-acceptance",
+										Image: "karolisr/bow:latest-acceptance",
 									},
 								},
 							},
@@ -491,15 +491,15 @@ func TestProvider_checkForUpdate(t *testing.T) {
 			name: "pubsub trigger, force-match, same tag on eu.gcr.io, daemonset",
 			args: args{
 				policy: policy.NewForcePolicy(false),
-				repo:   &types.Repository{Host: "eu.gcr.io", Name: "karolisr/keel", Tag: "latest-staging"},
+				repo:   &types.Repository{Host: "eu.gcr.io", Name: "karolisr/bow", Tag: "latest-staging"},
 				resource: MustParseGR(&apps_v1.DaemonSet{
 					meta_v1.TypeMeta{},
 					meta_v1.ObjectMeta{
 						Name:      "dep-1",
 						Namespace: "xxxx",
-						Labels:    map[string]string{types.KeelPolicyLabel: "force"},
+						Labels:    map[string]string{types.BowPolicyLabel: "force"},
 						Annotations: map[string]string{
-							types.KeelForceTagMatchLabel: "true",
+							types.BowForceTagMatchLabel: "true",
 						},
 					},
 					apps_v1.DaemonSetSpec{
@@ -512,7 +512,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "eu.gcr.io/karolisr/keel:latest-staging",
+										Image: "eu.gcr.io/karolisr/bow:latest-staging",
 									},
 								},
 							},
@@ -528,9 +528,9 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:      "dep-1",
 						Namespace: "xxxx",
 						Annotations: map[string]string{
-							types.KeelForceTagMatchLabel: "true",
+							types.BowForceTagMatchLabel: "true",
 						},
-						Labels: map[string]string{types.KeelPolicyLabel: "force"},
+						Labels: map[string]string{types.BowPolicyLabel: "force"},
 					},
 					apps_v1.DaemonSetSpec{
 						Template: v1.PodTemplateSpec{
@@ -543,7 +543,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "eu.gcr.io/karolisr/keel:latest-staging",
+										Image: "eu.gcr.io/karolisr/bow:latest-staging",
 									},
 								},
 							},
@@ -561,15 +561,15 @@ func TestProvider_checkForUpdate(t *testing.T) {
 			name: "daemonset, glob matcher",
 			args: args{
 				policy: mustParseGlob("glob:release-*"),
-				repo:   &types.Repository{Host: "eu.gcr.io", Name: "karolisr/keel", Tag: "release-2"},
+				repo:   &types.Repository{Host: "eu.gcr.io", Name: "karolisr/bow", Tag: "release-2"},
 				resource: MustParseGR(&apps_v1.DaemonSet{
 					meta_v1.TypeMeta{},
 					meta_v1.ObjectMeta{
 						Name:      "dep-1",
 						Namespace: "xxxx",
-						Labels:    map[string]string{types.KeelPolicyLabel: "glob:release-*"},
+						Labels:    map[string]string{types.BowPolicyLabel: "glob:release-*"},
 						Annotations: map[string]string{
-							types.KeelForceTagMatchLabel: "true",
+							types.BowForceTagMatchLabel: "true",
 						},
 					},
 					apps_v1.DaemonSetSpec{
@@ -582,7 +582,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "eu.gcr.io/karolisr/keel:release-1",
+										Image: "eu.gcr.io/karolisr/bow:release-1",
 									},
 								},
 							},
@@ -598,9 +598,9 @@ func TestProvider_checkForUpdate(t *testing.T) {
 						Name:      "dep-1",
 						Namespace: "xxxx",
 						Annotations: map[string]string{
-							types.KeelForceTagMatchLabel: "true",
+							types.BowForceTagMatchLabel: "true",
 						},
-						Labels: map[string]string{types.KeelPolicyLabel: "glob:release-*"},
+						Labels: map[string]string{types.BowPolicyLabel: "glob:release-*"},
 					},
 					apps_v1.DaemonSetSpec{
 						Template: v1.PodTemplateSpec{
@@ -613,7 +613,7 @@ func TestProvider_checkForUpdate(t *testing.T) {
 							Spec: v1.PodSpec{
 								Containers: []v1.Container{
 									v1.Container{
-										Image: "eu.gcr.io/karolisr/keel:release-2",
+										Image: "eu.gcr.io/karolisr/bow:release-2",
 									},
 								},
 							},
@@ -639,11 +639,11 @@ func TestProvider_checkForUpdate(t *testing.T) {
 			if gotShouldUpdateDeployment {
 				ann := gotUpdatePlan.Resource.GetSpecAnnotations()
 
-				if ann[types.KeelUpdateTimeAnnotation] != "" {
-					delete(ann, types.KeelUpdateTimeAnnotation)
+				if ann[types.BowUpdateTimeAnnotation] != "" {
+					delete(ann, types.BowUpdateTimeAnnotation)
 					gotUpdatePlan.Resource.SetSpecAnnotations(ann)
 				} else {
-					t.Errorf("Provider.checkUnversionedDeployment() missing types.KeelUpdateTimeAnnotation annotation")
+					t.Errorf("Provider.checkUnversionedDeployment() missing types.BowUpdateTimeAnnotation annotation")
 				}
 			}
 
@@ -682,7 +682,7 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+						Labels:      map[string]string{types.BowPolicyLabel: "all"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -710,7 +710,7 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+						Labels:      map[string]string{types.BowPolicyLabel: "all"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -748,7 +748,7 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "minor"},
+						Labels:      map[string]string{types.BowPolicyLabel: "minor"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -785,7 +785,7 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "minor"},
+						Labels:      map[string]string{types.BowPolicyLabel: "minor"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -822,7 +822,7 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+						Labels:      map[string]string{types.BowPolicyLabel: "all"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -857,7 +857,7 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+						Labels:      map[string]string{types.BowPolicyLabel: "all"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -888,7 +888,7 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+						Labels:      map[string]string{types.BowPolicyLabel: "all"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -928,7 +928,7 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "force"},
+						Labels:      map[string]string{types.BowPolicyLabel: "force"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -959,7 +959,7 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Name:        "dep-1",
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
-						Labels:      map[string]string{types.KeelPolicyLabel: "force"},
+						Labels:      map[string]string{types.BowPolicyLabel: "force"},
 					},
 					apps_v1.DeploymentSpec{
 						Template: v1.PodTemplateSpec{
@@ -1000,8 +1000,8 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
 						Labels: map[string]string{
-							types.KeelPolicyLabel:        "force",
-							types.KeelForceTagMatchLabel: "true",
+							types.BowPolicyLabel:        "force",
+							types.BowForceTagMatchLabel: "true",
 						},
 					},
 					apps_v1.DeploymentSpec{
@@ -1034,8 +1034,8 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
 						Labels: map[string]string{
-							types.KeelPolicyLabel:        "force",
-							types.KeelForceTagMatchLabel: "true",
+							types.BowPolicyLabel:        "force",
+							types.BowForceTagMatchLabel: "true",
 						},
 					},
 					apps_v1.DeploymentSpec{
@@ -1077,8 +1077,8 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 						Namespace:   "xxxx",
 						Annotations: map[string]string{},
 						Labels: map[string]string{
-							types.KeelPolicyLabel:        "force",
-							types.KeelForceTagMatchLabel: "true",
+							types.BowPolicyLabel:        "force",
+							types.BowForceTagMatchLabel: "true",
 						},
 					},
 					apps_v1.DeploymentSpec{
@@ -1123,12 +1123,12 @@ func TestProvider_checkForUpdateSemver(t *testing.T) {
 
 			if gotShouldUpdateDeployment {
 				ann := gotUpdatePlan.Resource.GetSpecAnnotations()
-				_, ok := ann[types.KeelUpdateTimeAnnotation]
+				_, ok := ann[types.BowUpdateTimeAnnotation]
 				if ok {
-					delete(ann, types.KeelUpdateTimeAnnotation)
+					delete(ann, types.BowUpdateTimeAnnotation)
 					gotUpdatePlan.Resource.SetSpecAnnotations(ann)
 				} else {
-					t.Errorf("Provider.checkVersionedDeployment() missing types.KeelUpdateTimeAnnotation annotation")
+					t.Errorf("Provider.checkVersionedDeployment() missing types.BowUpdateTimeAnnotation annotation")
 				}
 			}
 

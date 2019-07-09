@@ -1,9 +1,9 @@
 package secrets
 
 import (
-	"github.com/alwinius/keel/secrets"
+	"github.com/alwinius/bow/secrets"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 )
 
 // CredentialsHelper - credentials helper that uses kubernetes secrets to get

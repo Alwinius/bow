@@ -1,7 +1,7 @@
 package gitrepo
 
 import (
-	"github.com/alwinius/keel/internal/workgroup"
+	"github.com/alwinius/bow/internal/workgroup"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 )
 
 func TestWebhookRequest(t *testing.T) {

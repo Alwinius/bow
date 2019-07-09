@@ -2,7 +2,7 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "keel.fullname" . }}
+  name: {{ template "bow.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
 {{- if .Values.podDisruptionBudget.minAvailable }}
@@ -12,5 +12,5 @@ spec:
 {{- end }}
   selector:
     matchLabels:
-      app: {{ template "keel.name" . }}
+      app: {{ template "bow.name" . }}
 {{- end }}

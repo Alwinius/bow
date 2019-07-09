@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/alwinius/keel/pkg/store"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/pkg/store"
+	"github.com/alwinius/bow/types"
 	"github.com/google/uuid"
 
 	log "github.com/sirupsen/logrus"

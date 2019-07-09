@@ -1,4 +1,4 @@
-# Keel UI
+# bow UI
 
 TODO:
 
@@ -16,7 +16,7 @@ TODO:
 - [x] pause updates
 - [ ] SSE client
 
-TODO keel side:
+TODO bow side:
 
 - [ ] SSE server side
 - [ ] internal metrics API via https://github.com/rcrowley/go-metrics

@@ -1,14 +1,14 @@
 package bot
 
 import (
-	"github.com/alwinius/keel/bot/formatter"
+	"github.com/alwinius/bow/bot/formatter"
 	apps_v1 "k8s.io/api/apps/v1"
 )
 
 // Filter - deployment filter
 type Filter struct {
 	Namespace string
-	All       bool // keel or not
+	All       bool // bow or not
 }
 
 func convertToInternal(deployments []apps_v1.Deployment) []formatter.Deployment {

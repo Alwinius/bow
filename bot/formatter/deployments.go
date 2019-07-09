@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Deployment - internal deployment, used to better represent keel related info
+// Deployment - internal deployment, used to better represent bow related info
 type Deployment struct {
 	Namespace         string `json:"namespace,omitempty"`
 	Name              string `json:"name,omitempty"`

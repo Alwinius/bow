@@ -7,16 +7,16 @@ steps:
 
 # Fetch charts and index.yaml from GCS bucket
 - name: 'gcr.io/cloud-builders/gsutil'
-  args: ['rsync', 'gs://charts.keel.sh', 'temp/']
+  args: ['rsync', 'gs://charts.bow.sh', 'temp/']
   id: 'fetch_charts_index'
 
 # Index repository
 - name: 'ubuntu'
   env:
-  - 'REPO_URL=https://charts.keel.sh'
+  - 'REPO_URL=https://charts.bow.sh'
   args: ['bash', './.scripts/index_repo.sh']
 
 # Upload charts to GCS bucket
 - name: gcr.io/cloud-builders/gsutil
-  args: ['rsync', 'temp/', 'gs://charts.keel.sh']
+  args: ['rsync', 'temp/', 'gs://charts.bow.sh']
   id: 'upload_charts'

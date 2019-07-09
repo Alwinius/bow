@@ -3,10 +3,10 @@ package kubernetes
 import (
 	"testing"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/extension/notification"
-	"github.com/alwinius/keel/internal/k8s"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/extension/notification"
+	"github.com/alwinius/bow/internal/k8s"
+	"github.com/alwinius/bow/types"
 
 	apps_v1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -190,7 +190,7 @@ func TestGetImpacted(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:      "dep-1",
 				Namespace: "xxxx",
-				Labels:    map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:    map[string]string{types.BowPolicyLabel: "all"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -285,7 +285,7 @@ func TestGetImpactedPolicyAnnotations(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "dep-1",
 				Namespace:   "xxxx",
-				Annotations: map[string]string{types.KeelPolicyLabel: "all"},
+				Annotations: map[string]string{types.BowPolicyLabel: "all"},
 				Labels:      map[string]string{"foo": "all"},
 			},
 			apps_v1.DeploymentSpec{
@@ -386,7 +386,7 @@ func TestPrereleaseGetImpactedA(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:      "dep-1",
 				Namespace: "xxxx",
-				Labels:    map[string]string{types.KeelPolicyLabel: "major"},
+				Labels:    map[string]string{types.BowPolicyLabel: "major"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -406,7 +406,7 @@ func TestPrereleaseGetImpactedA(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:      "dep-2",
 				Namespace: "xxxx",
-				Labels:    map[string]string{types.KeelPolicyLabel: "major"},
+				Labels:    map[string]string{types.BowPolicyLabel: "major"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -476,7 +476,7 @@ func TestPrereleaseGetImpactedB(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:      "dep-1",
 				Namespace: "xxxx",
-				Labels:    map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:    map[string]string{types.BowPolicyLabel: "all"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -496,7 +496,7 @@ func TestPrereleaseGetImpactedB(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:      "dep-2",
 				Namespace: "xxxx",
-				Labels:    map[string]string{types.KeelPolicyLabel: "major"},
+				Labels:    map[string]string{types.BowPolicyLabel: "major"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -560,7 +560,7 @@ func TestProcessEvent(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "deployment-1",
 				Namespace:   "ns-1",
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 				Annotations: map[string]string{},
 			},
 			apps_v1.DeploymentSpec{
@@ -687,7 +687,7 @@ func TestProcessEventBuildNumber(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "deployment-1",
 				Namespace:   "xxxx",
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 				Annotations: map[string]string{},
 			},
 			apps_v1.DeploymentSpec{
@@ -748,7 +748,7 @@ func TestEventSent(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "deployment-1",
 				Namespace:   "xxxx",
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 				Annotations: map[string]string{},
 			},
 			apps_v1.DeploymentSpec{
@@ -814,8 +814,8 @@ func TestEventSentWithReleaseNotes(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "deployment-1",
 				Namespace:   "xxxx",
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
-				Annotations: map[string]string{types.KeelReleaseNotesURL: "https://github.com/alwinius/keel/releases"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
+				Annotations: map[string]string{types.BowReleaseNotesURL: "https://github.com/alwinius/bow/releases"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -857,8 +857,8 @@ func TestEventSentWithReleaseNotes(t *testing.T) {
 		t.Errorf("expected to find a deployment with updated image but found: %s", fp.updated.Containers()[0].Image)
 	}
 
-	if fs.sentEvent.Message != "Successfully updated deployment xxxx/deployment-1 10.0.0->11.0.0 (gcr.io/v2-namespace/hello-world:11.0.0). Release notes: https://github.com/alwinius/keel/releases" {
-		t.Errorf("expected 'Successfully updated deployment xxxx/deployment-1 10.0.0->11.0.0 (gcr.io/v2-namespace/hello-world:11.0.0). Release notes: https://github.com/alwinius/keel/releases' sent message, got: %s", fs.sentEvent.Message)
+	if fs.sentEvent.Message != "Successfully updated deployment xxxx/deployment-1 10.0.0->11.0.0 (gcr.io/v2-namespace/hello-world:11.0.0). Release notes: https://github.com/alwinius/bow/releases" {
+		t.Errorf("expected 'Successfully updated deployment xxxx/deployment-1 10.0.0->11.0.0 (gcr.io/v2-namespace/hello-world:11.0.0). Release notes: https://github.com/alwinius/bow/releases' sent message, got: %s", fs.sentEvent.Message)
 	}
 }
 
@@ -881,7 +881,7 @@ func TestGetImpactedTwoContainersInSameDeployment(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "dep-1",
 				Namespace:   "xxxx",
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 				Annotations: map[string]string{},
 			},
 			apps_v1.DeploymentSpec{
@@ -980,7 +980,7 @@ func TestGetImpactedTwoSameContainersInSameDeployment(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "dep-1",
 				Namespace:   "xxxx",
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 				Annotations: map[string]string{},
 			},
 			apps_v1.DeploymentSpec{
@@ -1080,7 +1080,7 @@ func TestGetImpactedUntaggedImage(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "dep-1",
 				Namespace:   "xxxx",
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 				Annotations: map[string]string{},
 			},
 			apps_v1.DeploymentSpec{
@@ -1102,7 +1102,7 @@ func TestGetImpactedUntaggedImage(t *testing.T) {
 				Name:        "dep-2",
 				Namespace:   "xxxx",
 				Annotations: map[string]string{},
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -1177,7 +1177,7 @@ func TestGetImpactedUntaggedOneImage(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:        "dep-1",
 				Namespace:   "xxxx",
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 				Annotations: map[string]string{},
 			},
 			apps_v1.DeploymentSpec{
@@ -1199,7 +1199,7 @@ func TestGetImpactedUntaggedOneImage(t *testing.T) {
 				Name:        "dep-2",
 				Namespace:   "xxxx",
 				Annotations: map[string]string{},
-				Labels:      map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:      map[string]string{types.BowPolicyLabel: "all"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -1275,7 +1275,7 @@ func TestTrackedImages(t *testing.T) {
 			meta_v1.ObjectMeta{
 				Name:      "dep-1",
 				Namespace: "xxxx",
-				Labels:    map[string]string{types.KeelPolicyLabel: "all"},
+				Labels:    map[string]string{types.BowPolicyLabel: "all"},
 			},
 			apps_v1.DeploymentSpec{
 				Template: v1.PodTemplateSpec{
@@ -1338,8 +1338,8 @@ func TestTrackedImagesWithSecrets(t *testing.T) {
 				Name:      "dep-1",
 				Namespace: "xxxx",
 				Labels: map[string]string{
-					types.KeelPolicyLabel:               "all",
-					types.KeelImagePullSecretAnnotation: "foo-bar",
+					types.BowPolicyLabel:               "all",
+					types.BowImagePullSecretAnnotation: "foo-bar",
 				},
 			},
 			apps_v1.DeploymentSpec{

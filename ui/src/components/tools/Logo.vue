@@ -9,7 +9,7 @@
 
 <script>
 
-import LogoSvg from '@/assets/keel-logo.svg?inline'
+import LogoSvg from '@/assets/bow-logo.svg?inline'
 
 export default {
   name: 'Logo',
@@ -19,7 +19,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: 'Keel',
+      default: 'bow',
       required: false
     },
     showTitle: {

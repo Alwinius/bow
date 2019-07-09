@@ -3,7 +3,7 @@ package k8s
 import (
 	"time"
 
-	"github.com/alwinius/keel/internal/workgroup"
+	"github.com/alwinius/bow/internal/workgroup"
 	"github.com/sirupsen/logrus"
 
 	apps_v1 "k8s.io/api/apps/v1"

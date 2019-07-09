@@ -6,9 +6,9 @@ import (
 	"cloud.google.com/go/pubsub"
 	"golang.org/x/net/context"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/cache/memory"
-	"github.com/alwinius/keel/provider"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/cache/memory"
+	"github.com/alwinius/bow/provider"
 
 	"testing"
 )

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/alwinius/keel/extension/credentialshelper"
-	"github.com/alwinius/keel/internal/gitrepo"
-	"github.com/alwinius/keel/secrets"
+	"github.com/alwinius/bow/extension/credentialshelper"
+	"github.com/alwinius/bow/internal/gitrepo"
+	"github.com/alwinius/bow/secrets"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -14,43 +14,43 @@ import (
 	netContext "golang.org/x/net/context"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/bot"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/bot"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 
-	// "github.com/alwinius/keel/cache/memory"
-	"github.com/alwinius/keel/pkg/auth"
-	"github.com/alwinius/keel/pkg/http"
-	"github.com/alwinius/keel/pkg/store"
-	"github.com/alwinius/keel/pkg/store/sql"
+	// "github.com/alwinius/bow/cache/memory"
+	"github.com/alwinius/bow/pkg/auth"
+	"github.com/alwinius/bow/pkg/http"
+	"github.com/alwinius/bow/pkg/store"
+	"github.com/alwinius/bow/pkg/store/sql"
 
-	"github.com/alwinius/keel/constants"
-	"github.com/alwinius/keel/extension/notification"
-	"github.com/alwinius/keel/internal/k8s"
-	"github.com/alwinius/keel/internal/workgroup"
-	"github.com/alwinius/keel/provider"
-	"github.com/alwinius/keel/provider/helm"
-	"github.com/alwinius/keel/provider/kubernetes"
-	"github.com/alwinius/keel/registry"
-	"github.com/alwinius/keel/trigger/poll"
-	"github.com/alwinius/keel/trigger/pubsub"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/version"
+	"github.com/alwinius/bow/constants"
+	"github.com/alwinius/bow/extension/notification"
+	"github.com/alwinius/bow/internal/k8s"
+	"github.com/alwinius/bow/internal/workgroup"
+	"github.com/alwinius/bow/provider"
+	"github.com/alwinius/bow/provider/helm"
+	"github.com/alwinius/bow/provider/kubernetes"
+	"github.com/alwinius/bow/registry"
+	"github.com/alwinius/bow/trigger/poll"
+	"github.com/alwinius/bow/trigger/pubsub"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/version"
 
 	// notification extensions
-	"github.com/alwinius/keel/extension/notification/auditor"
-	_ "github.com/alwinius/keel/extension/notification/hipchat"
-	_ "github.com/alwinius/keel/extension/notification/mattermost"
-	_ "github.com/alwinius/keel/extension/notification/slack"
-	_ "github.com/alwinius/keel/extension/notification/webhook"
+	"github.com/alwinius/bow/extension/notification/auditor"
+	_ "github.com/alwinius/bow/extension/notification/hipchat"
+	_ "github.com/alwinius/bow/extension/notification/mattermost"
+	_ "github.com/alwinius/bow/extension/notification/slack"
+	_ "github.com/alwinius/bow/extension/notification/webhook"
 
 	// credentials helpers
-	_ "github.com/alwinius/keel/extension/credentialshelper/aws"
-	secretsCredentialsHelper "github.com/alwinius/keel/extension/credentialshelper/secrets"
+	_ "github.com/alwinius/bow/extension/credentialshelper/aws"
+	secretsCredentialsHelper "github.com/alwinius/bow/extension/credentialshelper/secrets"
 
 	// bots
-	_ "github.com/alwinius/keel/bot/hipchat"
-	_ "github.com/alwinius/keel/bot/slack"
+	_ "github.com/alwinius/bow/bot/hipchat"
+	_ "github.com/alwinius/bow/bot/slack"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -72,21 +72,21 @@ const (
 	EnvRepoBranch        = "REPO_BRANCH"     // optional
 
 	// EnvDefaultDockerRegistryCfg - default registry configuration that can be passed into
-	// keel for polling trigger
+	// bow for polling trigger
 	EnvDefaultDockerRegistryCfg = "DOCKER_REGISTRY_CFG"
 )
 
 // EnvDebug - set to 1 or anything else to enable debug logging
 const EnvDebug = "DEBUG"
-const repoPath = "/home/alwin/projects/keel-tmp/"
+const repoPath = "/home/alwin/projects/bow-tmp/"
 
 func main() {
-	ver := version.GetKeelVersion()
+	ver := version.GetbowVersion()
 
 	uiDir := kingpin.Flag("ui-dir", "path to web UI static files").Default("www").Envar(EnvUIDir).String()
 
 	kingpin.UsageTemplate(kingpin.CompactUsageTemplate).Version(ver.Version)
-	kingpin.CommandLine.Help = "Automated Kubernetes deployment updates. Learn more on https://keel.sh."
+	kingpin.CommandLine.Help = "Automated Kubernetes deployment updates. Learn more on https://bow.sh."
 	kingpin.Parse()
 
 	log.WithFields(log.Fields{
@@ -96,7 +96,7 @@ func main() {
 		"version":    ver.Version,
 		"go_version": ver.GoVersion,
 		"arch":       ver.Arch,
-	}).Info("keel starting...")
+	}).Info("bow starting...")
 
 	if os.Getenv(EnvDebug) != "" {
 		log.SetLevel(log.DebugLevel)
@@ -109,7 +109,7 @@ func main() {
 
 	sqlStore, err := sql.New(sql.Opts{
 		DatabaseType: "sqlite3",
-		URI:          filepath.Join(dataDir, "keel.db"),
+		URI:          filepath.Join(dataDir, "bow.db"),
 	})
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -118,7 +118,7 @@ func main() {
 		os.Exit(1)
 	}
 	log.WithFields(log.Fields{
-		"database_path": filepath.Join(dataDir, "keel.db"),
+		"database_path": filepath.Join(dataDir, "bow.db"),
 		"type":          "sqlite3",
 	}).Info("initializing database")
 
@@ -324,7 +324,7 @@ func setupTriggers(ctx context.Context, opts *TriggerOpts) (teardown func()) {
 
 	// setting up generic http webhook server
 	whs := http.NewTriggerServer(&http.Opts{
-		Port:                  types.KeelDefaultPort,
+		Port:                  types.BowDefaultPort,
 		GRC:                   opts.grc,
 		Providers:             opts.providers,
 		ApprovalManager:       opts.approvalsManager,
@@ -339,7 +339,7 @@ func setupTriggers(ctx context.Context, opts *TriggerOpts) (teardown func()) {
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err,
-				"port":  types.KeelDefaultPort,
+				"port":  types.BowDefaultPort,
 			}).Fatal("trigger server stopped")
 		}
 	}()

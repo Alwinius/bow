@@ -5,14 +5,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/cache/memory"
-	"github.com/alwinius/keel/extension/credentialshelper"
-	"github.com/alwinius/keel/internal/policy"
-	"github.com/alwinius/keel/provider"
-	"github.com/alwinius/keel/registry"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/cache/memory"
+	"github.com/alwinius/bow/extension/credentialshelper"
+	"github.com/alwinius/bow/internal/policy"
+	"github.com/alwinius/bow/provider"
+	"github.com/alwinius/bow/registry"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 )
 
 func mustParse(img string, schedule string) *types.TrackedImage {
@@ -252,7 +252,7 @@ func TestWatchMultipleTags(t *testing.T) {
 				Image:        imgA,
 				Trigger:      types.TriggerTypePoll,
 				Provider:     "fp",
-				PollSchedule: types.KeelPollDefaultSchedule,
+				PollSchedule: types.BowPollDefaultSchedule,
 
 				Policy: policy.NewSemverPolicy(policy.SemverPolicyTypeMajor),
 			},
@@ -261,7 +261,7 @@ func TestWatchMultipleTags(t *testing.T) {
 				Trigger:      types.TriggerTypePoll,
 				Image:        imgB,
 				Provider:     "fp",
-				PollSchedule: types.KeelPollDefaultSchedule,
+				PollSchedule: types.BowPollDefaultSchedule,
 				Policy:       policy.NewSemverPolicy(policy.SemverPolicyTypeMajor),
 			},
 
@@ -269,7 +269,7 @@ func TestWatchMultipleTags(t *testing.T) {
 				Trigger:      types.TriggerTypePoll,
 				Image:        imgC,
 				Provider:     "fp",
-				PollSchedule: types.KeelPollDefaultSchedule,
+				PollSchedule: types.BowPollDefaultSchedule,
 				Policy:       policy.NewForcePolicy(true),
 			},
 
@@ -277,7 +277,7 @@ func TestWatchMultipleTags(t *testing.T) {
 				Trigger:      types.TriggerTypePoll,
 				Image:        imgD,
 				Provider:     "fp",
-				PollSchedule: types.KeelPollDefaultSchedule,
+				PollSchedule: types.BowPollDefaultSchedule,
 				Policy:       policy.NewForcePolicy(true),
 			},
 		},
@@ -402,7 +402,7 @@ func TestWatchTagJobLatestECR(t *testing.T) {
 				Image:        imgA,
 				Trigger:      types.TriggerTypePoll,
 				Provider:     "fp",
-				PollSchedule: types.KeelPollDefaultSchedule,
+				PollSchedule: types.BowPollDefaultSchedule,
 			},
 		},
 	}

@@ -3,12 +3,12 @@ package version
 import (
 	"runtime"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 )
 
 // Generic tool info
 const (
-	ProductName string = "keel"
+	ProductName string = "bow"
 	APIVersion         = "1"
 )
 
@@ -25,8 +25,8 @@ var Version string
 // Experimental is intended to be used to enable alpha features.
 var Experimental string
 
-// GetKeelVersion returns version info.
-func GetKeelVersion() types.VersionInfo {
+// GetbowVersion returns version info.
+func GetbowVersion() types.VersionInfo {
 	v := types.VersionInfo{
 		Name:       ProductName,
 		Revision:   Revision,

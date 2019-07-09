@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/alwinius/keel/pkg/store"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/pkg/store"
+	"github.com/alwinius/bow/types"
 )
 
 type approveRequest struct {
@@ -91,11 +91,11 @@ func (s *TriggerServer) approvalSetHandler(resp http.ResponseWriter, req *http.R
 		if v.Identifier == approvalUpdateRequest.Identifier {
 
 			labels := v.GetLabels()
-			delete(labels, types.KeelMinimumApprovalsLabel)
+			delete(labels, types.BowMinimumApprovalsLabel)
 			v.SetLabels(labels)
 
 			ann := v.GetAnnotations()
-			ann[types.KeelMinimumApprovalsLabel] = strconv.Itoa(approvalUpdateRequest.VotesRequired)
+			ann[types.BowMinimumApprovalsLabel] = strconv.Itoa(approvalUpdateRequest.VotesRequired)
 
 			v.SetAnnotations(ann)
 

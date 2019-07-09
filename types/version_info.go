@@ -20,7 +20,7 @@ type VersionResponse struct {
 	Server *VersionInfo
 }
 
-// ServerOK returns true when the client could connect to the keel
+// ServerOK returns true when the client could connect to the bow
 // and parse the information received. It returns false otherwise.
 func (v VersionResponse) ServerOK() bool {
 	return v.Server != nil

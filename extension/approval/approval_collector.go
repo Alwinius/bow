@@ -3,7 +3,7 @@ package approval
 import (
 	"sync"
 
-	"github.com/alwinius/keel/approvals"
+	"github.com/alwinius/bow/approvals"
 
 	log "github.com/sirupsen/logrus"
 )

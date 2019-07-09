@@ -15,23 +15,23 @@ var fakeRequest = `{
 		"tag": "0.1.7",
 		"pusher": "karolisr"
 	},
-	"callback_url": "https://registry.hub.docker.com/u/karolisr/keel/hook/22hagb51h1gfb4eefc5f1g4j3abi0beg4/",
+	"callback_url": "https://registry.hub.docker.com/u/karolisr/bow/hook/22hagb51h1gfb4eefc5f1g4j3abi0beg4/",
 	"repository": {
 		"status": "Active",
 		"description": "",
 		"is_trusted": false,
 		"full_description": "desc",
-		"repo_url": "https://hub.docker.com/r/karolisr/keel",
+		"repo_url": "https://hub.docker.com/r/karolisr/bow",
 		"owner": "karolisr",
 		"is_official": false,
 		"is_private": false,
-		"name": "keel",
+		"name": "bow",
 		"namespace": "karolisr",
 		"star_count": 0,
 		"comment_count": 0,
 		"date_created": 1497032538,
-		"dockerfile": "FROM golang:1.8.1-alpine\nCOPY . /go/src/github.com/alwinius/keel\nWORKDIR /go/src/github.com/alwinius/keel\nRUN apk add --no-cache git && go get\nRUN CGO_ENABLED=0 GOOS=linux go build -a -tags netgo -ldflags -'w' -o keel .\n\nFROM alpine:latest\nRUN apk --no-cache add ca-certificates\nCOPY --from=0 /go/src/github.com/alwinius/keel/keel /bin/keel\nENTRYPOINT [\"/bin/keel\"]\n\nEXPOSE 9300",
-		"repo_name": "karolisr/keel"
+		"dockerfile": "FROM golang:1.8.1-alpine\nCOPY . /go/src/github.com/alwinius/bow\nWORKDIR /go/src/github.com/alwinius/bow\nRUN apk add --no-cache git && go get\nRUN CGO_ENABLED=0 GOOS=linux go build -a -tags netgo -ldflags -'w' -o bow .\n\nFROM alpine:latest\nRUN apk --no-cache add ca-certificates\nCOPY --from=0 /go/src/github.com/alwinius/bow/bow /bin/bow\nENTRYPOINT [\"/bin/bow\"]\n\nEXPOSE 9300",
+		"repo_name": "karolisr/bow"
 	}
 }`
 
@@ -60,8 +60,8 @@ func TestDockerhubWebhookHandler(t *testing.T) {
 		t.Fatalf("unexpected number of events submitted: %d", len(fp.submitted))
 	}
 
-	if fp.submitted[0].Repository.Name != "karolisr/keel" {
-		t.Errorf("expected karolisr/keel but got %s", fp.submitted[0].Repository.Name)
+	if fp.submitted[0].Repository.Name != "karolisr/bow" {
+		t.Errorf("expected karolisr/bow but got %s", fp.submitted[0].Repository.Name)
 	}
 
 	if fp.submitted[0].Repository.Tag != "0.1.7" {

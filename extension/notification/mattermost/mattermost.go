@@ -9,9 +9,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/alwinius/keel/constants"
-	"github.com/alwinius/keel/extension/notification"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/constants"
+	"github.com/alwinius/bow/extension/notification"
+	"github.com/alwinius/bow/types"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -36,7 +36,7 @@ func init() {
 
 func (s *sender) Configure(config *notification.Config) (bool, error) {
 	// name in the notifications
-	s.name = "keel"
+	s.name = "bow"
 	// Get configuration
 	var httpConfig Config
 
@@ -90,7 +90,7 @@ type notificationEnvelope struct {
 func (s *sender) Send(event types.EventNotification) error {
 	// Marshal notification.
 	jsonNotification, err := json.Marshal(notificationEnvelope{
-		IconURL:  constants.KeelLogoURL,
+		IconURL:  constants.BowLogoURL,
 		Username: s.name,
 		Text:     fmt.Sprintf("#### %s \n %s", event.Type.String(), event.Message),
 	})

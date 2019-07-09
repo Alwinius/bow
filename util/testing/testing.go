@@ -3,9 +3,9 @@ package testing
 import (
 	"fmt"
 
-	"github.com/alwinius/keel/internal/k8s"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/internal/k8s"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 
 	apps_v1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"

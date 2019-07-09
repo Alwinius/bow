@@ -3,7 +3,7 @@ package policy
 import (
 	"strings"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -110,20 +110,20 @@ func ParseSemverPolicy(policy string) Policy {
 }
 
 func getPolicyFromLabels(labels map[string]string) (string, bool) {
-	policy, ok := labels[types.KeelPolicyLabel]
+	policy, ok := labels[types.BowPolicyLabel]
 	if ok {
 		return policy, true
 	}
-	legacy, ok := labels["keel.observer/policy"]
+	legacy, ok := labels["bow.observer/policy"]
 	return legacy, ok
 }
 
 func getMatchTag(labels map[string]string) bool {
-	mt, ok := labels[types.KeelForceTagMatchLabel]
+	mt, ok := labels[types.BowForceTagMatchLabel]
 	if ok {
 		return mt == "true"
 	}
-	legacyMt, ok := labels[types.KeelForceTagMatchLegacyLabel]
+	legacyMt, ok := labels[types.BowForceTagMatchLegacyLabel]
 	if ok {
 		return legacyMt == "true"
 	}

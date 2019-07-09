@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/alwinius/keel/constants"
+	"github.com/alwinius/bow/constants"
 
 	"github.com/rusenask/docker-registry-client/registry"
 
@@ -19,7 +19,7 @@ func TestDigest(t *testing.T) {
 	client := New()
 	digest, err := client.Digest(Opts{
 		Registry: "https://index.docker.io",
-		Name:     "keelhq/keel",
+		Name:     "alwin2/bow",
 		Tag:      "0.8.0",
 	})
 
@@ -36,7 +36,7 @@ func TestGet(t *testing.T) {
 	client := New()
 	repo, err := client.Get(Opts{
 		Registry: constants.DefaultDockerRegistry,
-		Name:     "keelhq/keel",
+		Name:     "alwin2/bow",
 	})
 
 	if err != nil {
@@ -110,7 +110,7 @@ func TestGetArtifactory(t *testing.T) {
 
 	client := New()
 	repo, err := client.Get(Opts{
-		Registry: "https://keel-docker-local.jfrog.io",
+		Registry: "https://bow-docker-local.jfrog.io",
 		Name:     "webhook-demo",
 		Username: os.Getenv(EnvArtifactoryUsername),
 		Password: os.Getenv(EnvArtifactoryPassword),
@@ -139,7 +139,7 @@ func TestInsecureRegistry(t *testing.T) {
 	client := New()
 	digest, err := client.Digest(Opts{
 		Registry: url,
-		Name:     "keelhq/keel",
+		Name:     "alwin2/bow",
 		Tag:      "0.8.0",
 	})
 

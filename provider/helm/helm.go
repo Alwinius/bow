@@ -6,16 +6,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/internal/policy"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/internal/policy"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 
 	hapi_chart "k8s.io/helm/pkg/proto/hapi/chart"
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/alwinius/keel/extension/notification"
+	"github.com/alwinius/bow/extension/notification"
 
 	"github.com/ghodss/yaml"
 	log "github.com/sirupsen/logrus"
@@ -67,7 +67,7 @@ type UpdatePlan struct {
 	Namespace string
 	Name      string
 
-	Config *KeelChartConfig
+	Config *bowChartConfig
 
 	// chart
 	Chart *hapi_chart.Chart
@@ -84,8 +84,8 @@ type UpdatePlan struct {
 	ReleaseNotes []string
 }
 
-// keel:
-//   # keel policy (all/major/minor/patch/force)
+// bow:
+//   # bow policy (all/major/minor/patch/force)
 //   policy: all
 //   # trigger type, defaults to events such as pubsub, webhooks
 //   trigger: poll
@@ -97,11 +97,11 @@ type UpdatePlan struct {
 
 // Root - root element of the values yaml
 type Root struct {
-	Keel KeelChartConfig `json:"keel"`
+	bow bowChartConfig `json:"bow"`
 }
 
-// KeelChartConfig - keel related configuration taken from values.yaml
-type KeelChartConfig struct {
+// bowChartConfig - bow related configuration taken from values.yaml
+type bowChartConfig struct {
 	Policy               string            `json:"policy"`
 	MatchTag             bool              `json:"matchTag"`
 	Trigger              types.TriggerType `json:"trigger"`
@@ -167,7 +167,7 @@ func (p *Provider) Stop() {
 	close(p.stop)
 }
 
-// TrackedImages - returns tracked images from all releases that have keel configuration
+// TrackedImages - returns tracked images from all releases that have bow configuration
 func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 	var trackedImages []*types.TrackedImage
 
@@ -188,7 +188,7 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 			continue
 		}
 
-		cfg, err := getKeelConfig(vals)
+		cfg, err := getbowConfig(vals)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error":     err,
@@ -199,7 +199,7 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 		}
 
 		if cfg.PollSchedule == "" {
-			cfg.PollSchedule = types.KeelPollDefaultSchedule
+			cfg.PollSchedule = types.BowPollDefaultSchedule
 		}
 		// used to check pod secrets
 		selector := fmt.Sprintf("app=%s,release=%s", release.Chart.Metadata.Name, release.Name)
@@ -436,7 +436,7 @@ func values(chart *hapi_chart.Chart, config *hapi_chart.Config) (chartutil.Value
 	return chartutil.CoalesceValues(chart, config)
 }
 
-func getKeelConfig(vals chartutil.Values) (*KeelChartConfig, error) {
+func getbowConfig(vals chartutil.Values) (*bowChartConfig, error) {
 	yamlFull, err := vals.YAML()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get vals config, error: %s", err)
@@ -445,14 +445,14 @@ func getKeelConfig(vals chartutil.Values) (*KeelChartConfig, error) {
 	var r Root
 	err = yaml.Unmarshal([]byte(yamlFull), &r)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse keel config: %s", err)
+		return nil, fmt.Errorf("failed to parse bow config: %s", err)
 	}
 
-	if r.Keel.Policy == "" {
+	if r.bow.Policy == "" {
 		return nil, ErrPolicyNotSpecified
 	}
 
-	cfg := r.Keel
+	cfg := r.bow
 
 	cfg.Plc = policy.GetPolicy(cfg.Policy, &policy.Options{MatchTag: cfg.MatchTag})
 

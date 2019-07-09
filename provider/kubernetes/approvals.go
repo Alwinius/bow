@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alwinius/keel/pkg/store"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/pkg/store"
+	"github.com/alwinius/bow/types"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -70,7 +70,7 @@ func getInt(key string, labels map[string]string, annotations map[string]string)
 
 func (p *Provider) isApproved(event *types.Event, plan *UpdatePlan) (bool, error) {
 
-	minApprovals, err := getInt(types.KeelMinimumApprovalsLabel, plan.Resource.GetLabels(), plan.Resource.GetAnnotations())
+	minApprovals, err := getInt(types.BowMinimumApprovalsLabel, plan.Resource.GetLabels(), plan.Resource.GetAnnotations())
 	if err != nil {
 		return false, err
 	}
@@ -80,8 +80,8 @@ func (p *Provider) isApproved(event *types.Event, plan *UpdatePlan) (bool, error
 	}
 
 	// deadline
-	deadline := types.KeelApprovalDeadlineDefault
-	d, err := getInt(types.KeelApprovalDeadlineLabel, plan.Resource.GetLabels(), plan.Resource.GetAnnotations())
+	deadline := types.BowApprovalDeadlineDefault
+	d, err := getInt(types.BowApprovalDeadlineLabel, plan.Resource.GetLabels(), plan.Resource.GetAnnotations())
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":    err,

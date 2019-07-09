@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alwinius/keel/pkg/store"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/pkg/store"
+	"github.com/alwinius/bow/types"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -59,7 +59,7 @@ func (p *Provider) isApproved(event *types.Event, plan *UpdatePlan) (bool, error
 			}
 
 			if plan.Config.ApprovalDeadline == 0 {
-				plan.Config.ApprovalDeadline = types.KeelApprovalDeadlineDefault
+				plan.Config.ApprovalDeadline = types.BowApprovalDeadlineDefault
 			}
 
 			// creating new one

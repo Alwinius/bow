@@ -3,7 +3,7 @@ package hipchat
 import (
 	"fmt"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 )
 
 func (b *Bot) RequestApproval(req *types.Approval) error {

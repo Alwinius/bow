@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/alwinius/keel/registry"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/registry"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 )
 
 func TestAWS(t *testing.T) {

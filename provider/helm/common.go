@@ -4,22 +4,22 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 
 	"k8s.io/helm/pkg/chartutil"
 
 	log "github.com/sirupsen/logrus"
 )
 
-// ErrKeelConfigNotFound - default error when keel configuration for chart is not defined
-var ErrKeelConfigNotFound = errors.New("keel configuration not found")
+// ErrbowConfigNotFound - default error when bow configuration for chart is not defined
+var ErrbowConfigNotFound = errors.New("bow configuration not found")
 
 // getImages - get images from chart values
 func getImages(vals chartutil.Values) ([]*types.TrackedImage, error) {
 	var images []*types.TrackedImage
 
-	keelCfg, err := getKeelConfig(vals)
+	bowCfg, err := getbowConfig(vals)
 	if err != nil {
 		if err == ErrPolicyNotSpecified {
 			// nothing to do
@@ -27,12 +27,12 @@ func getImages(vals chartutil.Values) ([]*types.TrackedImage, error) {
 		}
 		log.WithFields(log.Fields{
 			"error": err,
-		}).Error("provider.helm: failed to get keel configuration for release")
-		// ignoring this release, no keel config found
-		return nil, ErrKeelConfigNotFound
+		}).Error("provider.helm: failed to get bow configuration for release")
+		// ignoring this release, no bow config found
+		return nil, ErrbowConfigNotFound
 	}
 
-	for _, imageDetails := range keelCfg.Images {
+	for _, imageDetails := range bowCfg.Images {
 		imageRef, err := parseImage(vals, &imageDetails)
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -45,9 +45,9 @@ func getImages(vals chartutil.Values) ([]*types.TrackedImage, error) {
 
 		trackedImage := &types.TrackedImage{
 			Image:        imageRef,
-			PollSchedule: keelCfg.PollSchedule,
-			Trigger:      keelCfg.Trigger,
-			Policy:       keelCfg.Plc,
+			PollSchedule: bowCfg.PollSchedule,
+			Trigger:      bowCfg.Trigger,
+			Policy:       bowCfg.Plc,
 		}
 
 		images = append(images, trackedImage)

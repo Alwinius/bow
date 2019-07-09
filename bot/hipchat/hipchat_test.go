@@ -9,13 +9,13 @@ import (
 
 	h "github.com/daneharrigan/hipchat"
 
-	"github.com/alwinius/keel/approvals"
-	b "github.com/alwinius/keel/bot"
-	"github.com/alwinius/keel/cache/memory"
-	"github.com/alwinius/keel/provider/kubernetes"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/approvals"
+	b "github.com/alwinius/bow/bot"
+	"github.com/alwinius/bow/cache/memory"
+	"github.com/alwinius/bow/provider/kubernetes"
+	"github.com/alwinius/bow/types"
 
-	testutil "github.com/alwinius/keel/util/testing"
+	testutil "github.com/alwinius/bow/util/testing"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -59,7 +59,7 @@ type fakeXmppImplementer struct {
 
 func (i *fakeXmppImplementer) messageFromChat(message string) {
 	i.messages <- &h.Message{
-		Body: "@keel " + message,
+		Body: "@bow " + message,
 		From: "111111_approvals@conf.hipchat.com/test",
 		To:   "222222_333333@chat.hipchat.com/bot",
 	}
@@ -90,7 +90,7 @@ func NewBot(k8sImplementer kubernetes.Implementer,
 	fakeBot.hipchatClient = fi
 
 	os.Setenv("HIPCHAT_APPROVALS_CHANNEL", "111111_approvals@conf.hipchat.com")
-	os.Setenv("HIPCHAT_APPROVALS_BOT_NAME", "keel")
+	os.Setenv("HIPCHAT_APPROVALS_BOT_NAME", "bow")
 	os.Setenv("HIPCHAT_APPROVALS_USER_NAME", "111111_222222")
 	os.Setenv("HIPCHAT_APPROVALS_PASSWORT", "pass")
 	os.Setenv("HIPCHAT_CONNECTION_ATTEMPTS", "0")
@@ -119,7 +119,7 @@ func TestHelpCommand(t *testing.T) {
 	if len(fi.postedMessages) != 1 {
 		t.Errorf("expected to find 1 message, but got: %d", len(fi.postedMessages))
 	}
-	if !strings.HasPrefix(fi.postedMessages[0].text, "Keel bot was started") {
+	if !strings.HasPrefix(fi.postedMessages[0].text, "bow bot was started") {
 		t.Errorf("expected to find greeting message, but got: %s", fi.postedMessages[0].text)
 	}
 

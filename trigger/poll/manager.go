@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alwinius/keel/provider"
+	"github.com/alwinius/bow/provider"
 
 	log "github.com/sirupsen/logrus"
 )

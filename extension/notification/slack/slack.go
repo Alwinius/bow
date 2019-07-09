@@ -10,10 +10,10 @@ import (
 
 	"github.com/nlopes/slack"
 
-	"github.com/alwinius/keel/constants"
-	"github.com/alwinius/keel/extension/notification"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/version"
+	"github.com/alwinius/bow/constants"
+	"github.com/alwinius/bow/extension/notification"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/version"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -41,7 +41,7 @@ func (s *sender) Configure(config *notification.Config) (bool, error) {
 	if os.Getenv(constants.EnvSlackBotName) != "" {
 		s.botName = os.Getenv(constants.EnvSlackBotName)
 	} else {
-		s.botName = "keel"
+		s.botName = "bow"
 	}
 
 	if os.Getenv(constants.EnvSlackChannels) != "" {
@@ -59,10 +59,10 @@ func (s *sender) Configure(config *notification.Config) (bool, error) {
 	}).Info("extension.notification.slack: sender configured")
 
 	var msg string
-	if version.GetKeelVersion().Version != "" {
-		msg = fmt.Sprintf("Keel has started. Version: '%s'. Revision: %s", version.GetKeelVersion().Version, version.GetKeelVersion().Revision)
+	if version.GetbowVersion().Version != "" {
+		msg = fmt.Sprintf("bow has started. Version: '%s'. Revision: %s", version.GetbowVersion().Version, version.GetbowVersion().Revision)
 	} else {
-		msg = fmt.Sprintf("Keel has started. Revision: %s", version.GetKeelVersion().Revision)
+		msg = fmt.Sprintf("bow has started. Revision: %s", version.GetbowVersion().Revision)
 	}
 
 	err := s.Send(types.EventNotification{
@@ -86,7 +86,7 @@ func (s *sender) Configure(config *notification.Config) (bool, error) {
 func (s *sender) Send(event types.EventNotification) error {
 	params := slack.NewPostMessageParameters()
 	params.Username = s.botName
-	params.IconURL = constants.KeelLogoURL
+	params.IconURL = constants.BowLogoURL
 
 	attachements := []slack.Attachment{
 		slack.Attachment{
@@ -99,7 +99,7 @@ func (s *sender) Send(event types.EventNotification) error {
 					Short: false,
 				},
 			},
-			Footer: fmt.Sprintf("https://keel.sh %s", version.GetKeelVersion().Version),
+			Footer: fmt.Sprintf("https://bow.sh %s", version.GetbowVersion().Version),
 			Ts:     json.Number(strconv.Itoa(int(event.CreatedAt.Unix()))),
 		},
 	}

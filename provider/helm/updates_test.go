@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/alwinius/keel/internal/policy"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/internal/policy"
+	"github.com/alwinius/bow/types"
 	hapi_chart "k8s.io/helm/pkg/proto/hapi/chart"
 )
 
@@ -19,7 +19,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:
+bow:
   policy: force
   trigger: poll
   images:
@@ -36,13 +36,13 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:
+bow:
   policy: force
   trigger: poll
   images:
     - repository: image.repository
       tag: image.tag
-      releaseNotes: https://github.com/alwinius/keel/releases
+      releaseNotes: https://github.com/alwinius/bow/releases
 
 `
 
@@ -55,7 +55,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:
+bow:
   policy: major
   trigger: poll
   images:
@@ -106,7 +106,7 @@ keel:
 				Values:         map[string]string{"image.tag": "latest"},
 				CurrentVersion: "1.1.0",
 				NewVersion:     "latest",
-				Config: &KeelChartConfig{
+				Config: &bowChartConfig{
 					Policy:  "force",
 					Trigger: types.TriggerTypePoll,
 					Images: []ImageDetails{
@@ -137,15 +137,15 @@ keel:
 				Values:         map[string]string{"image.tag": "1.2.0"},
 				CurrentVersion: "1.1.0",
 				NewVersion:     "1.2.0",
-				ReleaseNotes:   []string{"https://github.com/alwinius/keel/releases"},
-				Config: &KeelChartConfig{
+				ReleaseNotes:   []string{"https://github.com/alwinius/bow/releases"},
+				Config: &bowChartConfig{
 					Policy:  "force",
 					Trigger: types.TriggerTypePoll,
 					Images: []ImageDetails{
 						ImageDetails{
 							RepositoryPath: "image.repository",
 							TagPath:        "image.tag",
-							ReleaseNotes:   "https://github.com/alwinius/keel/releases",
+							ReleaseNotes:   "https://github.com/alwinius/bow/releases",
 						},
 					},
 					Plc: policy.NewForcePolicy(false),
@@ -200,7 +200,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:
+bow:
   policy: all
   trigger: poll
   images:
@@ -218,7 +218,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: alpha
 
-keel:
+bow:
   policy: force
   trigger: poll
   images:
@@ -235,7 +235,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: alpha
 
-keel:
+bow:
   policy: major
   trigger: poll
   images:
@@ -251,14 +251,14 @@ where:
 image:
   repository: gcr.io/v2-namespace/hello-world:1.0.0
 
-keel:
+bow:
   policy: major
   trigger: poll
   images:
     - repository: image.repository
 `
 
-	chartValuesNoKeelCfg := `
+	chartValuesNobowCfg := `
 name: al Rashid
 where:
   city: Basrah
@@ -282,8 +282,8 @@ image:
 		Values: &hapi_chart.Config{Raw: chartValuesNoTag},
 	}
 
-	helloWorldNoKeelCfg := &hapi_chart.Chart{
-		Values: &hapi_chart.Config{Raw: chartValuesNoKeelCfg},
+	helloWorldNobowCfg := &hapi_chart.Chart{
+		Values: &hapi_chart.Config{Raw: chartValuesNobowCfg},
 	}
 
 	type args struct {
@@ -317,7 +317,7 @@ image:
 				Values:         map[string]string{"image.tag": "1.1.2"},
 				NewVersion:     "1.1.2",
 				CurrentVersion: "1.1.0",
-				Config: &KeelChartConfig{
+				Config: &bowChartConfig{
 					Policy:  "all",
 					Trigger: types.TriggerTypePoll,
 					Images: []ImageDetails{
@@ -373,7 +373,7 @@ image:
 				Values:         map[string]string{"image.tag": "1.1.0"},
 				NewVersion:     "1.1.0",
 				CurrentVersion: "alpha",
-				Config: &KeelChartConfig{
+				Config: &bowChartConfig{
 					Policy:  "force",
 					Trigger: types.TriggerTypePoll,
 					Images: []ImageDetails{
@@ -416,7 +416,7 @@ image:
 				Values:         map[string]string{"image.repository": "gcr.io/v2-namespace/hello-world:1.1.0"},
 				NewVersion:     "1.1.0",
 				CurrentVersion: "1.0.0",
-				Config: &KeelChartConfig{
+				Config: &bowChartConfig{
 					Policy:  "major",
 					Trigger: types.TriggerTypePoll,
 					Images: []ImageDetails{
@@ -429,16 +429,16 @@ image:
 			wantErr:                 false,
 		},
 		{
-			name: "no keel config",
+			name: "no bow config",
 			args: args{
 
 				repo:      &types.Repository{Name: "gcr.io/v2-namespace/hello-world", Tag: "1.1.0"},
 				namespace: "default",
 				name:      "release-1-no-tag",
-				chart:     helloWorldNoKeelCfg,
+				chart:     helloWorldNobowCfg,
 				config:    &hapi_chart.Config{Raw: ""},
 			},
-			wantPlan:                &UpdatePlan{Namespace: "default", Name: "release-1-no-tag", Chart: helloWorldNoKeelCfg, Values: map[string]string{}},
+			wantPlan:                &UpdatePlan{Namespace: "default", Name: "release-1-no-tag", Chart: helloWorldNobowCfg, Values: map[string]string{}},
 			wantShouldUpdateRelease: false,
 			wantErr:                 false,
 		},

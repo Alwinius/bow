@@ -2,7 +2,7 @@
 set -e
 
 # the repo path to this repository
-REPO_URL="https://charts.keel.sh"
+REPO_URL="https://charts.bow.sh"
 
 function gen_packages() {
   echo "Packaging charts from source code"
@@ -22,7 +22,7 @@ function gen_packages() {
 
 function index() {
   echo "Fetch charts and index.yaml"
-  gsutil rsync gs://charts.keel.sh ./temp/
+  gsutil rsync gs://charts.bow.sh ./temp/
 
   echo "Indexing repository"
   if [ -f index.yaml ]; then
@@ -34,7 +34,7 @@ function index() {
 
 function upload() {
   echo "Upload charts to GCS bucket"
-  gsutil rsync ./temp/ gs://charts.keel.sh
+  gsutil rsync ./temp/ gs://charts.bow.sh
 }
 
 # generate helm chart packages

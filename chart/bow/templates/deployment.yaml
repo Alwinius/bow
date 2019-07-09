@@ -1,36 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "keel.fullname" . }}
+  name: {{ template "bow.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "keel.name" . }}
-    chart: {{ template "keel.chart" . }}
+    app: {{ template "bow.name" . }}
+    chart: {{ template "bow.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ template "keel.name" . }}
+      app: {{ template "bow.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "keel.name" . }}
+        app: {{ template "bow.name" . }}
         release: {{ .Release.Name }}
 {{- with .Values.podAnnotations }}
       annotations:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
-      serviceAccountName: {{ template "keel.name" . }}
+      serviceAccountName: {{ template "bow.name" . }}
       containers:
-        - name: keel
+        - name: bow
           # Note that we use appVersion to get images tag.
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/keel"]
+          command: ["/bin/bow"]
           volumeMounts:
 {{- if .Values.persistance.enable}}
             - name: storage-logs
@@ -85,7 +85,7 @@ spec:
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "keel.name" . }}-aws-ecr
+                  name: {{ template "bow.name" . }}-aws-ecr
                   key: secretAccessKey
             - name: AWS_REGION
               value: "{{ .Values.ecr.region }}"
@@ -182,12 +182,12 @@ spec:
             - name: KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "keel.name" . }}-webhookrelay
+                  name: {{ template "bow.name" . }}-webhookrelay
                   key: key
             - name: SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "keel.name" . }}-webhookrelay
+                  name: {{ template "bow.name" . }}-webhookrelay
                   key: secret
             - name: BUCKET
               value: "{{ .Values.webhookRelay.bucket }}"
@@ -198,7 +198,7 @@ spec:
       volumes:
         - name: storage-logs
           persistentVolumeClaim:
-            claimName: {{ template "keel.fullname" . }}
+            claimName: {{ template "bow.fullname" . }}
 {{- end}}
     {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -216,5 +216,5 @@ spec:
       volumes:
         - name: google
           secret:
-            secretName: {{ template "keel.name" . }}-google
+            secretName: {{ template "bow.name" . }}-google
 {{- end }}

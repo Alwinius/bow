@@ -4,11 +4,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/cache/memory"
-	"github.com/alwinius/keel/extension/notification"
-	"github.com/alwinius/keel/internal/policy"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/cache/memory"
+	"github.com/alwinius/bow/extension/notification"
+	"github.com/alwinius/bow/internal/policy"
+	"github.com/alwinius/bow/types"
 	"github.com/ghodss/yaml"
 	"k8s.io/helm/pkg/chartutil"
 	"k8s.io/helm/pkg/helm"
@@ -61,9 +61,9 @@ func (i *fakeImplementer) UpdateReleaseFromChart(rlsName string, chart *chart.Ch
 	}, nil
 }
 
-// helper function to generate keel configuration
-func testingConfigYaml(cfg *KeelChartConfig) (vals chartutil.Values, err error) {
-	root := &Root{Keel: *cfg}
+// helper function to generate bow configuration
+func testingConfigYaml(cfg *bowChartConfig) (vals chartutil.Values, err error) {
+	root := &Root{bow: *cfg}
 	bts, err := yaml.Marshal(root)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:  
+bow:  
   policy: all  
   trigger: poll  
   images:
@@ -121,7 +121,7 @@ keel:
 			t.Fatalf("failed to get values: %s", err)
 		}
 
-		cfg, err := getKeelConfig(vals)
+		cfg, err := getbowConfig(vals)
 		if err != nil {
 			t.Errorf("failed to get image paths: %s", err)
 		}
@@ -167,7 +167,7 @@ func TestGetChartPolicyFromProm(t *testing.T) {
 			t.Fatalf("failed to get values: %s", err)
 		}
 
-		cfg, err := getKeelConfig(vals)
+		cfg, err := getbowConfig(vals)
 		if err != nil {
 			t.Errorf("failed to get image paths: %s", err)
 		}
@@ -197,7 +197,7 @@ image2:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.2.0 
 
-keel:  
+bow:  
   policy: all  
   trigger: poll  
   images:
@@ -230,7 +230,7 @@ keel:
 	}
 }
 
-func TestGetTrackedReleasesWithoutKeelConfig(t *testing.T) {
+func TestGetTrackedReleasesWithoutbowConfig(t *testing.T) {
 
 	chartVals := `
 name: chart-x
@@ -287,7 +287,7 @@ image2:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.2.0 
 
-keel:  
+bow:  
   policy: all  
   trigger: poll  
   images:
@@ -321,12 +321,12 @@ keel:
 }
 
 func TestGetTriggerFromConfig(t *testing.T) {
-	vals, err := testingConfigYaml(&KeelChartConfig{Trigger: types.TriggerTypePoll, Policy: "all"})
+	vals, err := testingConfigYaml(&bowChartConfig{Trigger: types.TriggerTypePoll, Policy: "all"})
 	if err != nil {
 		t.Fatalf("Failed to load testdata: %s", err)
 	}
 
-	cfg, err := getKeelConfig(vals)
+	cfg, err := getbowConfig(vals)
 	if err != nil {
 		t.Fatalf("failed to get image paths: %s", err)
 	}
@@ -337,12 +337,12 @@ func TestGetTriggerFromConfig(t *testing.T) {
 }
 
 func TestGetPolicyFromConfig(t *testing.T) {
-	vals, err := testingConfigYaml(&KeelChartConfig{Policy: "all"})
+	vals, err := testingConfigYaml(&bowChartConfig{Policy: "all"})
 	if err != nil {
 		t.Fatalf("Failed to load testdata: %s", err)
 	}
 
-	cfg, err := getKeelConfig(vals)
+	cfg, err := getbowConfig(vals)
 	if err != nil {
 		t.Errorf("failed to get image paths: %s", err)
 	}
@@ -354,7 +354,7 @@ func TestGetPolicyFromConfig(t *testing.T) {
 }
 
 func TestGetImagesFromConfig(t *testing.T) {
-	vals, err := testingConfigYaml(&KeelChartConfig{Policy: "all", Images: []ImageDetails{
+	vals, err := testingConfigYaml(&bowChartConfig{Policy: "all", Images: []ImageDetails{
 		ImageDetails{
 			RepositoryPath: "repopath",
 			TagPath:        "tagpath",
@@ -364,7 +364,7 @@ func TestGetImagesFromConfig(t *testing.T) {
 		t.Fatalf("Failed to load testdata: %s", err)
 	}
 
-	cfg, err := getKeelConfig(vals)
+	cfg, err := getbowConfig(vals)
 	if err != nil {
 		t.Errorf("failed to get image paths: %s", err)
 	}
@@ -390,7 +390,7 @@ image:
   repository: karolisr/webhook-demo
   tag: 0.0.10
 
-keel:  
+bow:  
   policy: all  
   trigger: poll  
   images:
@@ -445,7 +445,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:  
+bow:  
   policy: all  
   trigger: poll 
   pollSchedule: "@every 12m" 
@@ -458,7 +458,7 @@ keel:
 func TestGetPollingSchedule(t *testing.T) {
 	vals, _ := chartutil.ReadValues([]byte(pollingValues))
 
-	cfg, err := getKeelConfig(vals)
+	cfg, err := getbowConfig(vals)
 	if err != nil {
 		t.Errorf("failed to get config: %s", err)
 	}
@@ -468,7 +468,7 @@ func TestGetPollingSchedule(t *testing.T) {
 	}
 }
 
-func Test_getKeelConfig(t *testing.T) {
+func Test_getbowConfig(t *testing.T) {
 
 	var valuesBasicStr = `
 name: al Rashid
@@ -479,7 +479,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:  
+bow:  
   policy: all  
   images:
     - repository: image.repository
@@ -497,7 +497,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:
+bow:
   policy: all
   notificationChannels:
     - chan1
@@ -518,7 +518,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:  
+bow:  
   policy: major  
   trigger: poll
   pollSchedule: "@every 30m"
@@ -535,13 +535,13 @@ keel:
 	tests := []struct {
 		name    string
 		args    args
-		want    *KeelChartConfig
+		want    *bowChartConfig
 		wantErr bool
 	}{
 		{
 			name: "correct config",
 			args: args{vals: valuesBasic},
-			want: &KeelChartConfig{
+			want: &bowChartConfig{
 				Policy:  "all",
 				Trigger: types.TriggerTypeDefault,
 				Images: []ImageDetails{
@@ -553,7 +553,7 @@ keel:
 		{
 			name: "custom notification channels",
 			args: args{vals: valuesChannels},
-			want: &KeelChartConfig{
+			want: &bowChartConfig{
 				Policy:               "all",
 				Trigger:              types.TriggerTypeDefault,
 				NotificationChannels: []string{"chan1", "chan2"},
@@ -566,7 +566,7 @@ keel:
 		{
 			name: "correct polling config",
 			args: args{vals: valuesPoll},
-			want: &KeelChartConfig{
+			want: &bowChartConfig{
 				Policy:       "major",
 				Trigger:      types.TriggerTypePoll,
 				PollSchedule: "@every 30m",
@@ -579,13 +579,13 @@ keel:
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getKeelConfig(tt.args.vals)
+			got, err := getbowConfig(tt.args.vals)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getKeelConfig() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getbowConfig() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getKeelConfig() = %v, want %v", got, tt.want)
+				t.Errorf("getbowConfig() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -602,7 +602,7 @@ image:
   repository: gcr.io/v2-namespace/hello-world
   tag: 1.1.0
 
-keel:  
+bow:  
   policy: all  
   trigger: poll
   matchTag: true
@@ -641,7 +641,7 @@ keel:
 			t.Fatalf("failed to get values: %s", err)
 		}
 
-		cfg, err := getKeelConfig(vals)
+		cfg, err := getbowConfig(vals)
 		if err != nil {
 			t.Errorf("failed to get image paths: %s", err)
 		}

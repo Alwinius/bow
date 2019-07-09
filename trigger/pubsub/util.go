@@ -21,11 +21,11 @@ func containerRegistrySubName(clusterName, projectID, topic string) string {
 			log.WithFields(log.Fields{
 				"error":             err,
 				"metadata_endpoint": MetadataEndpoint,
-			}).Warn("trigger.pubsub.containerRegistrySubName: got error while retrieving cluster metadata, messages might be lost if more than one Keel instance is created")
+			}).Warn("trigger.pubsub.containerRegistrySubName: got error while retrieving cluster metadata, messages might be lost if more than one bow instance is created")
 		}
 	}
 
-	return "keel-" + clusterName + "-" + projectID + "-" + topic
+	return "bow-" + clusterName + "-" + projectID + "-" + topic
 }
 
 // https://cloud.google.com/compute/docs/storing-retrieving-metadata

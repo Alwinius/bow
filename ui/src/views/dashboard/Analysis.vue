@@ -7,7 +7,7 @@
             <a-icon type="info-circle-o" />
           </a-tooltip>
 
-          <template slot="footer">Managed by Keel: <span>{{ $store.getters.resourcesManaged.length }}</span></template>
+          <template slot="footer">Managed by bow: <span>{{ $store.getters.resourcesManaged.length }}</span></template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
@@ -126,7 +126,7 @@
         </span>
         <!-- labels -->
         <span slot="labels" slot-scope="text, resource">
-          <a-tag v-for="(item, key, index) in resource._keel_opts" color="blue" :key="index">
+          <a-tag v-for="(item, key, index) in resource._bow_opts" color="blue" :key="index">
             {{ key }}: {{ item }}
           </a-tag>
         </span>
@@ -243,7 +243,7 @@ export default {
         width: 180,
         scopedSlots: { customRender: 'images' }
       }, {
-        title: 'Keel Labels & Annotations',
+        title: 'bow Labels & Annotations',
         key: 'labels',
         dataIndex: 'labels',
         width: 230,
@@ -384,7 +384,7 @@ export default {
         provider: resource.provider
       }
 
-      const current = resource.annotations['keel.sh/approvals']
+      const current = resource.annotations['bow.sh/approvals']
       if (increase) {
         // increasing approvals count
         if (current) {

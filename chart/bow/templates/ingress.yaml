@@ -1,5 +1,5 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "keel.fullname" . -}}
+{{- $fullName := include "bow.fullname" . -}}
 
 {{- if .Values.gcloud.managedCertificates.enabled }}
 apiVersion: networking.gke.io/v1beta1
@@ -19,8 +19,8 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    app.kubernetes.io/name: {{ include "keel.name" . }}
-    helm.sh/chart: {{ include "keel.chart" . }}
+    app.kubernetes.io/name: {{ include "bow.name" . }}
+    helm.sh/chart: {{ include "bow.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{- with .Values.ingress.labels }}
@@ -37,7 +37,7 @@ spec:
 {{- if not .Values.ingress.hosts }}
   backend:
     serviceName: {{ $fullName }}
-    servicePort: keel
+    servicePort: bow
 {{- end }}
 {{- if .Values.ingress.tls }}
   tls:
@@ -59,7 +59,7 @@ spec:
           - path: {{ . }}
             backend:
               serviceName: {{ $fullName }}
-              servicePort: keel
+              servicePort: bow
         {{- end }}
   {{- end }}
 {{- end }}

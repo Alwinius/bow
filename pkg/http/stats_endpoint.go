@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 )
 
 type dailyStats struct {

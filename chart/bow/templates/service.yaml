@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "keel.name" . }}
+  name: {{ template "bow.name" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "keel.name" . }}
-    chart: {{ template "keel.chart" . }}
+    app: {{ template "bow.name" . }}
+    chart: {{ template "bow.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 {{- with .Values.serviceAnnotations }}
@@ -24,8 +24,8 @@ spec:
       targetPort: 9300
   {{- end }}
       protocol: TCP
-      name: keel
+      name: bow
   selector:
-    app: {{ template "keel.name" . }}
+    app: {{ template "bow.name" . }}
   sessionAffinity: None
 {{- end }}

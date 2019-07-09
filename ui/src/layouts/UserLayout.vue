@@ -4,7 +4,7 @@
       <div class="top">
         <div class="header">
           <a href="/">
-            <span class="title">Keel</span>
+            <span class="title">bow</span>
           </a>
         </div>
         <div class="desc">
@@ -16,7 +16,7 @@
 
       <div class="footer">
         <div class="links">
-          <a href="https://github.com/alwinius/keel" target="_blank" rel="noopener"><a-icon type="github" /> GitHub</a>
+          <a href="https://github.com/alwinius/bow" target="_blank" rel="noopener"><a-icon type="github" /> GitHub</a>
         </div>
         <div class="copyright">
           Copyright &copy; 2019 AppScension Ltd.

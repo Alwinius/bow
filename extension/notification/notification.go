@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/stopper"
-	"github.com/alwinius/keel/util/timeutil"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/stopper"
+	"github.com/alwinius/bow/util/timeutil"
 
 	log "github.com/sirupsen/logrus"
 )

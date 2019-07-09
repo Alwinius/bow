@@ -52,7 +52,7 @@ func createNamespaceForTest() string {
 	_, clientset := getKubernetesClient()
 	ns := &v1.Namespace{
 		ObjectMeta: meta_v1.ObjectMeta{
-			GenerateName: "keel-e2e-test-",
+			GenerateName: "bow-e2e-test-",
 		},
 	}
 	cns, err := clientset.CoreV1().Namespaces().Create(ns)
@@ -73,17 +73,17 @@ func deleteTestNamespace(namespace string) error {
 	return clientset.CoreV1().Namespaces().Delete(namespace, &deleteOptions)
 }
 
-type KeelCmd struct {
+type bowCmd struct {
 	cmd *exec.Cmd
 
 	env []string
 }
 
-func (kc *KeelCmd) Start(ctx context.Context) error {
+func (kc *bowCmd) Start(ctx context.Context) error {
 
-	log.Info("keel started")
+	log.Info("bow started")
 
-	cmd := "keel"
+	cmd := "bow"
 	args := []string{"--no-incluster", "--kubeconfig", getKubeConfig()}
 	c := exec.CommandContext(ctx, cmd, args...)
 	c.Env = []string{
@@ -105,8 +105,8 @@ func (kc *KeelCmd) Start(ctx context.Context) error {
 	return err
 }
 
-func (kc *KeelCmd) Stop() error {
-	defer log.Info("keel stopped")
+func (kc *bowCmd) Stop() error {
+	defer log.Info("bow stopped")
 	return kc.cmd.Process.Kill()
 }
 

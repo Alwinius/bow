@@ -2,7 +2,7 @@
   <div class="footer">
     <div class="links">
       <a
-        href="https://github.com/alwinius/keel"
+        href="https://github.com/alwinius/bow"
         target="_blank"
       >
         <a-icon type="github" />
@@ -10,7 +10,7 @@
     </div>
     <div class="copyright">
       Copyright
-      <a-icon type="copyright" /> 2019 <span>Keel</span>
+      <a-icon type="copyright" /> 2019 <span>bow</span>
     </div>
   </div>
 </template>

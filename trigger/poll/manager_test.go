@@ -4,15 +4,15 @@ import (
 	"context"
 	"os"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/cache/memory"
-	"github.com/alwinius/keel/provider"
-	"github.com/alwinius/keel/registry"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/cache/memory"
+	"github.com/alwinius/bow/provider"
+	"github.com/alwinius/bow/registry"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 
-	// "github.com/alwinius/keel/extension/credentialshelper"
-	_ "github.com/alwinius/keel/extension/credentialshelper/aws"
+	// "github.com/alwinius/bow/extension/credentialshelper"
+	_ "github.com/alwinius/bow/extension/credentialshelper/aws"
 
 	"testing"
 )
@@ -35,14 +35,14 @@ func TestCheckDeployment(t *testing.T) {
 				Image:        imgA,
 				Trigger:      types.TriggerTypePoll,
 				Provider:     "fp",
-				PollSchedule: types.KeelPollDefaultSchedule,
+				PollSchedule: types.BowPollDefaultSchedule,
 			},
 
 			&types.TrackedImage{
 				Trigger:      types.TriggerTypePoll,
 				Image:        imgB,
 				Provider:     "fp",
-				PollSchedule: types.KeelPollDefaultSchedule,
+				PollSchedule: types.BowPollDefaultSchedule,
 			},
 		},
 	}
@@ -75,7 +75,7 @@ func TestCheckDeployment(t *testing.T) {
 	if watcher.watched[keyA].digest != frc.digestToReturn {
 		t.Errorf("unexpected digest")
 	}
-	if watcher.watched[keyA].schedule != types.KeelPollDefaultSchedule {
+	if watcher.watched[keyA].schedule != types.BowPollDefaultSchedule {
 		t.Errorf("unexpected schedule: %s", watcher.watched[keyA].schedule)
 	}
 	if watcher.watched[keyA].trackedImage.Image.Remote() != ref.Remote() {
@@ -90,7 +90,7 @@ func TestCheckDeployment(t *testing.T) {
 	if watcher.watched[keyB].digest != frc.digestToReturn {
 		t.Errorf("unexpected digest")
 	}
-	if watcher.watched[keyB].schedule != types.KeelPollDefaultSchedule {
+	if watcher.watched[keyB].schedule != types.BowPollDefaultSchedule {
 		t.Errorf("unexpected schedule: %s", watcher.watched[keyB].schedule)
 	}
 	if watcher.watched[keyB].trackedImage.Image.Remote() != refB.Remote() {
@@ -119,7 +119,7 @@ func TestCheckECRDeployment(t *testing.T) {
 				Image:        imgA,
 				Trigger:      types.TriggerTypePoll,
 				Provider:     "fp",
-				PollSchedule: types.KeelPollDefaultSchedule,
+				PollSchedule: types.BowPollDefaultSchedule,
 			},
 		},
 	}
@@ -152,7 +152,7 @@ func TestCheckECRDeployment(t *testing.T) {
 	if watcher.watched[keyA].digest != "sha256:7712aa425c17c2e413e5f4d64e2761eda009509d05d0e45a26e389d715aebe23" {
 		t.Errorf("unexpected digest: %s", watcher.watched[keyA].digest)
 	}
-	if watcher.watched[keyA].schedule != types.KeelPollDefaultSchedule {
+	if watcher.watched[keyA].schedule != types.BowPollDefaultSchedule {
 		t.Errorf("unexpected schedule: %s", watcher.watched[keyA].schedule)
 	}
 	if watcher.watched[keyA].trackedImage.Image.Remote() != imgA.Remote() {

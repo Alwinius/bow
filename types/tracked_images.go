@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/util/image"
 )
 
 // Credentials - registry credentials

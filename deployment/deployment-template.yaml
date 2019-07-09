@@ -3,23 +3,23 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: "{{ .namespace | default "keel" }}"
+  name: "{{ .namespace | default "bow" }}"
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: keel
-  namespace: "{{ .namespace | default "keel" }}"
+  name: bow
+  namespace: "{{ .namespace | default "bow" }}"
   labels:
-    app: keel
+    app: bow
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: keel
+  name: bow
 rules:
   - apiGroups:
       - ""
@@ -71,54 +71,54 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: keel
+  name: bow
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: keel
+  name: bow
 subjects:
   - kind: ServiceAccount
-    name: keel
-    namespace: "{{ .namespace | default "keel" }}"
+    name: bow
+    namespace: "{{ .namespace | default "bow" }}"
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: keel
-  namespace: "{{ .namespace | default "keel" }}"
+  name: bow
+  namespace: "{{ .namespace | default "bow" }}"
   labels:
-    app: keel
+    app: bow
 spec:
   type: LoadBalancer
   ports:
     - port: 9300
       targetPort: 9300
       protocol: TCP
-      name: keel
+      name: bow
   selector:
-    app: keel
+    app: bow
   sessionAffinity: None
 
 ---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: keel
-  namespace: "{{ .namespace | default "keel" }}"
+  name: bow
+  namespace: "{{ .namespace | default "bow" }}"
   labels:
-    app: keel
+    app: bow
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: keel
+      app: bow
   template:
     metadata:
       labels:
-        app: keel
+        app: bow
     spec:
-      serviceAccountName: keel
+      serviceAccountName: bow
       containers:
         {{ if .relay_key }}
         - name: webhookrelayd
@@ -139,11 +139,11 @@ spec:
               value: "{{ .relay_bucket }}"
             {{ end }}
         {{ end }}
-        - name: keel
+        - name: bow
           # Note that we use appVersion to get images tag.
-          image: "keelhq/keel:{{ .tag | latestRegistrySemver "keelhq/keel" }}"
+          image: "alwin2/bow:{{ .tag | latestRegistrySemver "alwin2/bow" }}"
           imagePullPolicy: Always
-          command: ["/bin/keel"]
+          command: ["/bin/bow"]
           env:
             - name: NAMESPACE
               valueFrom:
@@ -186,7 +186,7 @@ spec:
             - name: SLACK_APPROVALS_CHANNEL
               value: "{{ .slack_approvals_channel | default "general" }}"
             - name: SLACK_BOT_NAME
-              value: "{{ .bot_name | default "keel" }}"
+              value: "{{ .bot_name | default "bow" }}"
             # Enable hipchat approvials and notification
             - name: HIPCHAT_TOKEN
               value: ""
@@ -223,26 +223,26 @@ spec:
       {{ if.volume_name }}        
           volumeMounts:
           - mountPath: /data
-            name: keel-data   # must match the name of the volume
+            name: bow-data   # must match the name of the volume
       # Provision a fresh volume for the pod
       volumes:        
-        - name: keel-data
+        - name: bow-data
           gcePersistentDisk:
             # This disk must already exist. Check Readme
-            pdName: {{ .volume_name | default "keel-data" }}
+            pdName: {{ .volume_name | default "bow-data" }}
             fsType: ext4        
       {{ end }}
 
 ---
-# Source: keel/templates/pod-disruption-budget.yaml
+# Source: bow/templates/pod-disruption-budget.yaml
 
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: keel
-  namespace: "{{ .namespace | default "keel" }}"
+  name: bow
+  namespace: "{{ .namespace | default "bow" }}"
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: keel
+      app: bow

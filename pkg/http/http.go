@@ -15,13 +15,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/negroni"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/internal/k8s"
-	"github.com/alwinius/keel/pkg/auth"
-	"github.com/alwinius/keel/pkg/store"
-	"github.com/alwinius/keel/provider"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/version"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/internal/k8s"
+	"github.com/alwinius/bow/pkg/auth"
+	"github.com/alwinius/bow/pkg/store"
+	"github.com/alwinius/bow/provider"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/version"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -200,7 +200,7 @@ func (s *TriggerServer) healthHandler(resp http.ResponseWriter, req *http.Reques
 }
 
 func (s *TriggerServer) versionHandler(resp http.ResponseWriter, req *http.Request) {
-	v := version.GetKeelVersion()
+	v := version.GetbowVersion()
 
 	encoded, err := json.Marshal(v)
 	if err != nil {

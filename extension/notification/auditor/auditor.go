@@ -3,9 +3,9 @@ package auditor
 import (
 	"github.com/google/uuid"
 
-	"github.com/alwinius/keel/extension/notification"
-	"github.com/alwinius/keel/pkg/store"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/extension/notification"
+	"github.com/alwinius/bow/pkg/store"
+	"github.com/alwinius/bow/types"
 
 	log "github.com/sirupsen/logrus"
 )

@@ -9,7 +9,7 @@ type Translator struct {
 
 	GenericResourceCache
 
-	KeelSelector string
+	bowSelector string
 }
 
 func (t *Translator) OnAdd(obj interface{}) {

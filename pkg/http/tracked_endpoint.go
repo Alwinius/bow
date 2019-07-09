@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 )
 
 type trackedImage struct {
@@ -82,19 +82,19 @@ func (s *TriggerServer) trackSetHandler(resp http.ResponseWriter, req *http.Requ
 			return
 		}
 	} else {
-		trackReq.Schedule = types.KeelPollDefaultSchedule
+		trackReq.Schedule = types.BowPollDefaultSchedule
 	}
 
 	for _, v := range s.grc.Values() {
 		if v.Identifier == trackReq.Identifier {
 
 			labels := v.GetLabels()
-			delete(labels, types.KeelTriggerLabel)
+			delete(labels, types.BowTriggerLabel)
 			v.SetLabels(labels)
 
 			ann := v.GetAnnotations()
-			ann[types.KeelTriggerLabel] = trackReq.Trigger
-			ann[types.KeelPollScheduleAnnotation] = trackReq.Schedule
+			ann[types.BowTriggerLabel] = trackReq.Trigger
+			ann[types.BowPollScheduleAnnotation] = trackReq.Schedule
 
 			v.SetAnnotations(ann)
 

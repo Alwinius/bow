@@ -1,4 +1,4 @@
-// Package types holds most of the types used across Keel
+// Package types holds most of the types used across bow
 //go:generate jsonenums -type=Notification
 //go:generate jsonenums -type=Level
 //go:generate jsonenums -type=TriggerType
@@ -15,53 +15,53 @@ import (
 	"time"
 )
 
-// KeelDefaultPort - default port for application
-const KeelDefaultPort = 9300
+// BowDefaultPort - default port for application
+const BowDefaultPort = 9300
 
-// KeelPolicyLabel - keel update policies (version checking)
-const KeelPolicyLabel = "keel.sh/policy"
+// BowPolicyLabel - bow update policies (version checking)
+const BowPolicyLabel = "bow/policy"
 
-const KeelImagePullSecretAnnotation = "keel.sh/imagePullSecret"
+const BowImagePullSecretAnnotation = "bow/imagePullSecret"
 
-// KeelTriggerLabel - trigger label is used to specify custom trigger types
-// for example keel.sh/trigger=poll would signal poll trigger to start watching for repository
+// BowTriggerLabel - trigger label is used to specify custom trigger types
+// for example bow.sh/trigger=poll would signal poll trigger to start watching for repository
 // changes
-const KeelTriggerLabel = "keel.sh/trigger"
+const BowTriggerLabel = "bow/trigger"
 
-// KeelForceTagMatchLabel - label that checks whether tags match before force updating
-const KeelForceTagMatchLegacyLabel = "keel.sh/match-tag"
-const KeelForceTagMatchLabel = "keel.sh/matchTag"
+// BowForceTagMatchLabel - label that checks whether tags match before force updating
+const BowForceTagMatchLegacyLabel = "bow/match-tag"
+const BowForceTagMatchLabel = "bow/matchTag"
 
-// KeelPollScheduleAnnotation - optional variable to setup custom schedule for polling, defaults to @every 10m
-const KeelPollScheduleAnnotation = "keel.sh/pollSchedule"
+// BowPollScheduleAnnotation - optional variable to setup custom schedule for polling, defaults to @every 10m
+const BowPollScheduleAnnotation = "bow/pollSchedule"
 
-// KeelPollDefaultSchedule - defaul polling schedule
-const KeelPollDefaultSchedule = "@every 5m"
+// BowPollDefaultSchedule - defaul polling schedule
+const BowPollDefaultSchedule = "@every 5m"
 
-// KeelDigestAnnotation - digest annotation
-const KeelDigestAnnotation = "keel.sh/digest"
+// BowDigestAnnotation - digest annotation
+const BowDigestAnnotation = "bow/digest"
 
-// KeelNotificationChanAnnotation - optional notification to override
+// BowNotificationChanAnnotation - optional notification to override
 // default notification channel(-s) per deployment/chart
-const KeelNotificationChanAnnotation = "keel.sh/notify"
+const BowNotificationChanAnnotation = "bow/notify"
 
-// KeelMinimumApprovalsLabel - min approvals
-const KeelMinimumApprovalsLabel = "keel.sh/approvals"
+// BowMinimumApprovalsLabel - min approvals
+const BowMinimumApprovalsLabel = "bow/approvals"
 
-// KeelUpdateTimeAnnotation - update time
-const KeelUpdateTimeAnnotation = "keel.sh/update-time"
+// bowUpdateTimeAnnotation - update time
+const BowUpdateTimeAnnotation = "bow/update-time"
 
-// KeelApprovalDeadlineLabel - approval deadline
-const KeelApprovalDeadlineLabel = "keel.sh/approvalDeadline"
+// BowApprovalDeadlineLabel - approval deadline
+const BowApprovalDeadlineLabel = "bow/approvalDeadline"
 
-// KeelApprovalDeadlineDefault - default deadline in hours
-const KeelApprovalDeadlineDefault = 24
+// BowApprovalDeadlineDefault - default deadline in hours
+const BowApprovalDeadlineDefault = 24
 
-// KeelReleasePage - optional release notes URL passed on with notification
-const KeelReleaseNotesURL = "keel.sh/releaseNotes"
+// BowReleasePage - optional release notes URL passed on with notification
+const BowReleaseNotesURL = "bow/releaseNotes"
 
 // Repository - represents main docker repository fields that
-// keel cares about
+// bow cares about
 type Repository struct {
 	Host   string `json:"host"`
 	Name   string `json:"name"`
@@ -197,7 +197,7 @@ func ParseEventNotificationChannels(annotations map[string]string) []string {
 	if annotations == nil {
 		return channels
 	}
-	chanStr, ok := annotations[KeelNotificationChanAnnotation]
+	chanStr, ok := annotations[BowNotificationChanAnnotation]
 	if ok {
 		chans := strings.Split(chanStr, ",")
 		for _, c := range chans {
@@ -213,7 +213,7 @@ func ParseReleaseNotesURL(annotations map[string]string) string {
 		return ""
 	}
 
-	return annotations[KeelReleaseNotesURL]
+	return annotations[BowReleaseNotesURL]
 }
 
 // Notification - notification types used by notifier

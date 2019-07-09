@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 )
 
 func Test_getPolicyFromLabels(t *testing.T) {
@@ -19,19 +19,19 @@ func Test_getPolicyFromLabels(t *testing.T) {
 	}{
 		{
 			name:  "policy all",
-			args:  args{labels: map[string]string{types.KeelPolicyLabel: "all"}},
+			args:  args{labels: map[string]string{types.BowPolicyLabel: "all"}},
 			want1: true,
 			want:  "all",
 		},
 		{
 			name:  "policy minor",
-			args:  args{labels: map[string]string{types.KeelPolicyLabel: "minor"}},
+			args:  args{labels: map[string]string{types.BowPolicyLabel: "minor"}},
 			want1: true,
 			want:  "minor",
 		},
 		{
 			name:  "legacy policy minor",
-			args:  args{labels: map[string]string{"keel.observer/policy": "minor"}},
+			args:  args{labels: map[string]string{"bow.observer/policy": "minor"}},
 			want1: true,
 			want:  "minor",
 		},
@@ -106,15 +106,15 @@ func TestGetPolicyFromLabelsOrAnnotations(t *testing.T) {
 			name: "annotations policy",
 			args: args{
 				labels:      map[string]string{"foo": "bar"},
-				annotations: map[string]string{types.KeelPolicyLabel: "all"},
+				annotations: map[string]string{types.BowPolicyLabel: "all"},
 			},
 			want: NewSemverPolicy(SemverPolicyTypeAll),
 		},
 		{
 			name: "annotations overides labels",
 			args: args{
-				labels:      map[string]string{types.KeelPolicyLabel: "patch"},
-				annotations: map[string]string{types.KeelPolicyLabel: "all"},
+				labels:      map[string]string{types.BowPolicyLabel: "patch"},
+				annotations: map[string]string{types.BowPolicyLabel: "all"},
 			},
 			want: NewSemverPolicy(SemverPolicyTypeAll),
 		},

@@ -3,9 +3,9 @@ GIT_REVISION	= $(shell git rev-parse --short HEAD)
 VERSION		?= $(shell git describe --tags --abbrev=0)
 
 LDFLAGS		+= -linkmode external -extldflags -static
-LDFLAGS		+= -X github.com/alwinius/keel/version.Version=$(VERSION)
-LDFLAGS		+= -X github.com/alwinius/keel/version.Revision=$(GIT_REVISION)
-LDFLAGS		+= -X github.com/alwinius/keel/version.BuildDate=$(JOBDATE)
+LDFLAGS		+= -X github.com/alwinius/bow/version.Version=$(VERSION)
+LDFLAGS		+= -X github.com/alwinius/bow/version.Revision=$(GIT_REVISION)
+LDFLAGS		+= -X github.com/alwinius/bow/version.BuildDate=$(JOBDATE)
 
 .PHONY: release
 
@@ -14,32 +14,32 @@ fetch-certs:
 	cp cacert.pem ca-certificates.crt
 
 compress:
-	upx --brute cmd/keel/release/keel-linux-arm
-	upx --brute cmd/keel/release/keel-linux-aarch64
+	upx --brute cmd/bow/release/bow-linux-arm
+	upx --brute cmd/bow/release/bow-linux-aarch64
 
 build-binaries:
 	go get github.com/mitchellh/gox
-	@echo "++ Building keel binaries"
-	cd cmd/keel && gox -verbose -output="release/{{.Dir}}-{{.OS}}-{{.Arch}}" \
+	@echo "++ Building bow binaries"
+	cd cmd/bow && gox -verbose -output="release/{{.Dir}}-{{.OS}}-{{.Arch}}" \
 		-ldflags "$(LDFLAGS)" -osarch="linux/arm"
 	@echo "++ building aarch64 binary"
-	cd cmd/keel && env GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o release/keel-linux-aarch64
+	cd cmd/bow && env GOARCH=arm64 GOOS=linux go build -ldflags="-s -w" -o release/bow-linux-aarch64
 
 armhf-latest:
-	docker build -t keelhq/keel-arm:latest -f Dockerfile.armhf .
-	docker push keelhq/keel-arm:latest
+	docker build -t alwin2/bow-arm:latest -f Dockerfile.armhf .
+	docker push alwin2/bow-arm:latest
 
 aarch64-latest:
-	docker build -t keelhq/keel-aarch64:latest -f Dockerfile.aarch64 .
-	docker push keelhq/keel-aarch64:latest
+	docker build -t alwin2/bow-aarch64:latest -f Dockerfile.aarch64 .
+	docker push alwin2/bow-aarch64:latest
 
 armhf:
-	docker build -t keelhq/keel-arm:$(VERSION) -f Dockerfile.armhf .
-	docker push keelhq/keel-arm:$(VERSION)
+	docker build -t alwin2/bow-arm:$(VERSION) -f Dockerfile.armhf .
+	docker push alwin2/bow-arm:$(VERSION)
 
 aarch64:
-	docker build -t keelhq/keel-aarch64:$(VERSION) -f Dockerfile.aarch64 .
-	docker push keelhq/keel-aarch64:$(VERSION)
+	docker build -t alwin2/bow-aarch64:$(VERSION) -f Dockerfile.aarch64 .
+	docker push alwin2/bow-aarch64:$(VERSION)
 
 arm: build-binaries	compress fetch-certs armhf aarch64
 
@@ -48,23 +48,23 @@ test:
 	go test -json -v `go list ./... | egrep -v /tests` -cover | tparse -all -smallscreen
 
 build:
-	@echo "++ Building keel"
-	GOOS=linux cd cmd/keel && go build -a -tags netgo -ldflags "$(LDFLAGS) -w -s" -o keel .
+	@echo "++ Building bow"
+	GOOS=linux cd cmd/bow && go build -a -tags netgo -ldflags "$(LDFLAGS) -w -s" -o bow .
 
 install:
-	@echo "++ Installing keel"
-	# CGO_ENABLED=0 GOOS=linux go install -ldflags "$(LDFLAGS)" github.com/alwinius/keel/cmd/keel
-	GOOS=linux go install -ldflags "$(LDFLAGS)" github.com/alwinius/keel/cmd/keel
+	@echo "++ Installing bow"
+	# CGO_ENABLED=0 GOOS=linux go install -ldflags "$(LDFLAGS)" github.com/alwinius/bow/cmd/bow
+	GOOS=linux go install -ldflags "$(LDFLAGS)" github.com/alwinius/bow/cmd/bow
 
 image:
-	docker build -t keelhq/keel:alpha -f Dockerfile .
+	docker build -t alwin2/bow:alpha -f Dockerfile .
 
 image-debian:
-	docker build -t keelhq/keel:alpha -f Dockerfile.debian .
+	docker build -t alwin2/bow:alpha -f Dockerfile.debian .
 
 alpha: image
-	@echo "++ Pushing keel alpha"
-	docker push keelhq/keel:alpha
+	@echo "++ Pushing bow alpha"
+	docker push alwin2/bow:alpha
 
 gen-deploy:
 	deployment/scripts/gen-deploy.sh
@@ -73,7 +73,7 @@ e2e: install
 	cd tests && go test
 
 run: install
-	keel --no-incluster --ui-dir ../../rusenask/keel-ui/dist
+	bow --no-incluster --ui-dir ../../rusenask/bow-ui/dist
 
 lint-ui:
 	cd ui && yarn 
@@ -83,8 +83,8 @@ run-ui:
 	cd ui && yarn run serve
 
 build-ui:
-	docker build -t keelhq/keel:ui -f Dockerfile .
-	docker push keelhq/keel:ui
+	docker build -t alwin2/bow:ui -f Dockerfile .
+	docker push alwin2/bow:ui
 
 run-debug: install
-	DEBUG=true keel --no-incluster
+	DEBUG=true bow --no-incluster

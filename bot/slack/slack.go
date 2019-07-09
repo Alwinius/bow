@@ -12,9 +12,9 @@ import (
 
 	"github.com/nlopes/slack"
 
-	"github.com/alwinius/keel/bot"
-	"github.com/alwinius/keel/constants"
-	"github.com/alwinius/keel/version"
+	"github.com/alwinius/bow/bot"
+	"github.com/alwinius/bow/constants"
+	"github.com/alwinius/bow/version"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -53,7 +53,7 @@ func init() {
 func (b *Bot) Configure(approvalsRespCh chan *bot.ApprovalResponse, botMessagesChannel chan *bot.BotMessage) bool {
 	if os.Getenv(constants.EnvSlackToken) != "" {
 
-		b.name = "keel"
+		b.name = "bow"
 		if bootName := os.Getenv(constants.EnvSlackBotName); bootName != "" {
 			b.name = bootName
 		}
@@ -153,7 +153,7 @@ func (b *Bot) postMessage(title, message, color string, fields []slack.Attachmen
 			Fallback: message,
 			Color:    color,
 			Fields:   fields,
-			Footer:   fmt.Sprintf("https://keel.sh %s", version.GetKeelVersion().Version),
+			Footer:   fmt.Sprintf("https://bow.sh %s", version.GetbowVersion().Version),
 			Ts:       json.Number(strconv.Itoa(int(time.Now().Unix()))),
 		},
 	}
@@ -252,7 +252,7 @@ func (b *Bot) Respond(text string, channel string) {
 	// longer messages are getting uploaded as files
 
 	f := slack.FileUploadParameters{
-		Filename: "keel response",
+		Filename: "bow response",
 		Content:  text,
 		Filetype: "text",
 		Channels: []string{channel},

@@ -1,6 +1,6 @@
 apiVersion: v1
-name: keel
-description: Open source, tool for automating Kubernetes deployment updates. Keel is stateless, robust and lightweight.
+name: bow
+description: Open source, tool for automating Kubernetes deployment updates. bow is stateless, robust and lightweight.
 version: 0.8.5
 # Note that we use appVersion to get images tag, so make sure this is correct.
 appVersion: 0.14.0
@@ -8,13 +8,13 @@ keywords:
 - kubernetes deployment
 - helm release
 - continuous deployment
-home: https://keel.sh
+home: https://bow.sh
 sources:
-- https://github.com/alwinius/keel
+- https://github.com/alwinius/bow
 maintainers:
 - name: rimusz
   email: rmocius@gmail.com
 - name: rusenask
   email: karolis.rusenas@gmail.com
 engine: gotpl
-icon: https://raw.githubusercontent.com/alwinius/keel/master/static/keel-logo.png
+icon: https://raw.githubusercontent.com/alwinius/bow/master/static/bow-logo.png

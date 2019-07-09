@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/cache/memory"
-	"github.com/alwinius/keel/internal/policy"
-	"github.com/alwinius/keel/provider"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/cache/memory"
+	"github.com/alwinius/bow/internal/policy"
+	"github.com/alwinius/bow/provider"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 )
 
 func TestWatchMultipleTagsWithSemver(t *testing.T) {
@@ -22,7 +22,7 @@ func TestWatchMultipleTagsWithSemver(t *testing.T) {
 				Image:        imgA,
 				Trigger:      types.TriggerTypePoll,
 				Provider:     "fp",
-				PollSchedule: types.KeelPollDefaultSchedule,
+				PollSchedule: types.BowPollDefaultSchedule,
 				Policy:       policy.NewSemverPolicy(policy.SemverPolicyTypeAll),
 			},
 		},

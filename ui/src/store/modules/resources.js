@@ -10,19 +10,19 @@ const resources = {
     SET_RESOURCES: (state, resources) => {
       state.resources = []
       for (var i = 0; i < resources.length; i++) {
-        const keelOpts = {}
+        const bowOpts = {}
 
-        const approvals = resources[i].annotations['keel.sh/approvals']
+        const approvals = resources[i].annotations['bow.sh/approvals']
         if (approvals) {
           resources[i]._required_approvals = approvals
         }
 
-        const triggerAnnotation = resources[i].annotations['keel.sh/trigger']
+        const triggerAnnotation = resources[i].annotations['bow.sh/trigger']
         if (triggerAnnotation) {
           resources[i]._trigger_poll = triggerAnnotation === 'poll'
         } else {
           // additional check for labels
-          const triggerLabel = resources[i].labels['keel.sh/trigger']
+          const triggerLabel = resources[i].labels['bow.sh/trigger']
           if (triggerLabel) {
             resources[i]._trigger_poll = triggerLabel === 'poll'
           } else {
@@ -33,8 +33,8 @@ const resources = {
         const labels = resources[i].labels
         for (var label in labels) {
           if (labels.hasOwnProperty(label)) {
-            if (label.startsWith('keel.sh/')) {
-              keelOpts[label] = labels[label]
+            if (label.startsWith('bow.sh/')) {
+              bowOpts[label] = labels[label]
             }
           }
         }
@@ -42,13 +42,13 @@ const resources = {
         const annotations = resources[i].annotations
         for (var annotation in annotations) {
           if (annotations.hasOwnProperty(annotation)) {
-            if (annotation.startsWith('keel.sh/')) {
-              keelOpts[annotation] = annotations[annotation]
+            if (annotation.startsWith('bow.sh/')) {
+              bowOpts[annotation] = annotations[annotation]
             }
           }
         }
 
-        resources[i]._keel_opts = keelOpts
+        resources[i]._bow_opts = bowOpts
       }
       state.resources = resources
     },

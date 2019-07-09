@@ -2,8 +2,8 @@ package gitrepo
 
 import (
 	"fmt"
-	"github.com/alwinius/keel/provider/helm"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/provider/helm"
+	"github.com/alwinius/bow/util/image"
 	"github.com/sirupsen/logrus"
 	cryptossh "golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
@@ -34,7 +34,7 @@ type Repo struct {
 	Branch         plumbing.ReferenceName
 }
 
-const committerName = "Keel.sh"
+const committerName = "bow.sh"
 const committerEMail = "admin@example.com"
 
 func (r *Repo) init() {

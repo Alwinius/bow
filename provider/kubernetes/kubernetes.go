@@ -2,7 +2,7 @@ package kubernetes
 
 import (
 	"fmt"
-	"github.com/alwinius/keel/internal/gitrepo"
+	"github.com/alwinius/bow/internal/gitrepo"
 	"regexp"
 	"strings"
 	"time"
@@ -12,13 +12,13 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/alwinius/keel/approvals"
-	"github.com/alwinius/keel/extension/notification"
-	"github.com/alwinius/keel/internal/k8s"
-	"github.com/alwinius/keel/internal/policy"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
-	"github.com/alwinius/keel/util/policies"
+	"github.com/alwinius/bow/approvals"
+	"github.com/alwinius/bow/extension/notification"
+	"github.com/alwinius/bow/internal/k8s"
+	"github.com/alwinius/bow/internal/policy"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
+	"github.com/alwinius/bow/util/policies"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -127,7 +127,7 @@ func (p *Provider) Stop() {
 
 func getImagePullSecretFromMeta(labels map[string]string, annotations map[string]string) string {
 
-	searchKey := strings.ToLower(types.KeelImagePullSecretAnnotation)
+	searchKey := strings.ToLower(types.BowImagePullSecretAnnotation)
 
 	for k, v := range labels {
 		if strings.ToLower(k) == searchKey {
@@ -158,7 +158,7 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 		//	continue
 		//}
 
-		schedule, ok := annotations[types.KeelPollScheduleAnnotation]
+		schedule, ok := annotations[types.BowPollScheduleAnnotation]
 		if ok {
 			_, err := cron.Parse(schedule)
 			if err != nil {
@@ -168,10 +168,10 @@ func (p *Provider) TrackedImages() ([]*types.TrackedImage, error) {
 					"name":      gr.Name,
 					"namespace": gr.Namespace,
 				}).Error("provider.kubernetes: failed to parse poll schedule, setting default schedule")
-				schedule = types.KeelPollDefaultSchedule
+				schedule = types.BowPollDefaultSchedule
 			}
 		} else {
-			schedule = types.KeelPollDefaultSchedule
+			schedule = types.BowPollDefaultSchedule
 		}
 
 		// trigger type, we only care for "poll" type triggers
@@ -287,7 +287,7 @@ func (p *Provider) updateDeployments(plans []*UpdatePlan) (updated []*k8s.Generi
 		var err error
 
 		timestamp := time.Now().Format(time.RFC3339)
-		annotations["kubernetes.io/change-cause"] = fmt.Sprintf("keel automated update, version %s -> %s [%s]", plan.CurrentVersion, plan.NewVersion, timestamp)
+		annotations["kubernetes.io/change-cause"] = fmt.Sprintf("bow automated update, version %s -> %s [%s]", plan.CurrentVersion, plan.NewVersion, timestamp)
 
 		resource.SetAnnotations(annotations)
 

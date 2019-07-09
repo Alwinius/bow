@@ -15,15 +15,15 @@ gen() {
 	TMP_OUTPUT=$(mktemp)
 
 	mkdir -p "$(dirname ${OUTPUT})"
-  cp chart/keel/values.yaml "${TMP_VALUES}"/
+  cp chart/bow/values.yaml "${TMP_VALUES}"/
   sed -i 's/false/true/g' "${TMP_VALUES}/values.yaml"
 	helm template \
-		"chart/keel" \
+		"chart/bow" \
     --values "${TMP_VALUES}/values.yaml" \
 		--values "deployment/values/${VALUES}.yaml" \
 		--kube-version "${KUBE_VERSION}" \
-		--namespace "keel" \
-		--name "keel" \
+		--namespace "bow" \
+		--name "bow" \
 		--set "createNamespaceResource=true" > "${TMP_OUTPUT}"
   mv "${TMP_OUTPUT}" "${OUTPUT}"
   rm -fr "${TMP_VALUES}"

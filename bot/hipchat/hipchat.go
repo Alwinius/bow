@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alwinius/keel/bot"
-	"github.com/alwinius/keel/constants"
+	"github.com/alwinius/bow/bot"
+	"github.com/alwinius/bow/constants"
 
 	h "github.com/daneharrigan/hipchat"
 	log "github.com/sirupsen/logrus"
@@ -41,7 +41,7 @@ func init() {
 
 func (b *Bot) Configure(approvalsRespCh chan *bot.ApprovalResponse, botMessagesChannel chan *bot.BotMessage) bool {
 	if isHipchatConfigured() {
-		b.name = "keel"
+		b.name = "bow"
 		if os.Getenv(constants.EnvHipchatApprovalsBotName) != "" {
 			b.name = os.Getenv(constants.EnvHipchatApprovalsBotName)
 		}
@@ -80,7 +80,7 @@ func (b *Bot) Start(ctx context.Context) error {
 	client := b.hipchatClient
 	client.Status("chat")
 	client.Join(b.approvalsChannel, b.name)
-	b.postMessage("Keel bot was started")
+	b.postMessage("bow bot was started")
 	go client.KeepAlive()
 	go func() {
 		for {

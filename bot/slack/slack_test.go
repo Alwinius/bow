@@ -7,18 +7,18 @@ import (
 
 	"github.com/nlopes/slack"
 
-	"github.com/alwinius/keel/extension/approval"
-	"github.com/alwinius/keel/provider/kubernetes"
+	"github.com/alwinius/bow/extension/approval"
+	"github.com/alwinius/bow/provider/kubernetes"
 
-	"github.com/alwinius/keel/approvals"
-	b "github.com/alwinius/keel/bot"
-	"github.com/alwinius/keel/cache/memory"
-	"github.com/alwinius/keel/constants"
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/approvals"
+	b "github.com/alwinius/bow/bot"
+	"github.com/alwinius/bow/cache/memory"
+	"github.com/alwinius/bow/constants"
+	"github.com/alwinius/bow/types"
 
 	"testing"
 
-	testutil "github.com/alwinius/keel/util/testing"
+	testutil "github.com/alwinius/bow/util/testing"
 )
 
 var botMessagesChannel chan *b.BotMessage
@@ -98,7 +98,7 @@ func TestBotRequest(t *testing.T) {
 
 	am := approvals.New(mem)
 
-	New("keel", token, "approvals", f8s, am, fi)
+	New("bow", token, "approvals", f8s, am, fi)
 	defer b.Stop()
 
 	time.Sleep(1 * time.Second)
@@ -142,7 +142,7 @@ func TestProcessApprovedResponse(t *testing.T) {
 
 	am := approvals.New(mem)
 
-	New("keel", token, "approvals", f8s, am, fi)
+	New("bow", token, "approvals", f8s, am, fi)
 	defer b.Stop()
 
 	time.Sleep(1 * time.Second)
@@ -206,7 +206,7 @@ func TestProcessApprovalReply(t *testing.T) {
 		t.Fatalf("unexpected error while creating : %s", err)
 	}
 
-	bot := New("keel", token, "approvals", f8s, am, fi)
+	bot := New("bow", token, "approvals", f8s, am, fi)
 	defer b.Stop()
 
 	time.Sleep(1 * time.Second)
@@ -273,7 +273,7 @@ func TestProcessRejectedReply(t *testing.T) {
 		t.Fatalf("unexpected error while creating : %s", err)
 	}
 
-	bot := New("keel", "random", "approvals", f8s, am, fi)
+	bot := New("bow", "random", "approvals", f8s, am, fi)
 	defer b.Stop()
 
 	collector := approval.New()
@@ -337,7 +337,7 @@ func TestIsApproval(t *testing.T) {
 	// if err != nil {
 	// 	t.Fatalf("unexpected error while creating : %s", err)
 	// }
-	// bot := New("keel", "random", "approvals", f8s, am, fi)
+	// bot := New("bow", "random", "approvals", f8s, am, fi)
 	event := &slack.MessageEvent{
 		Msg: slack.Msg{
 			Channel: "approvals",

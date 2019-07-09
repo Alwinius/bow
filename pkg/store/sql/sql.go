@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alwinius/keel/types"
+	"github.com/alwinius/bow/types"
 	"github.com/jinzhu/gorm"
 
 	// importing sqlite driver

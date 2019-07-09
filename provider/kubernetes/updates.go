@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alwinius/keel/internal/k8s"
-	"github.com/alwinius/keel/internal/policy"
-	"github.com/alwinius/keel/types"
-	"github.com/alwinius/keel/util/image"
+	"github.com/alwinius/bow/internal/k8s"
+	"github.com/alwinius/bow/internal/policy"
+	"github.com/alwinius/bow/types"
+	"github.com/alwinius/bow/util/image"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -25,7 +25,7 @@ func checkForUpdate(plc policy.Policy, repo *types.Repository, resource *k8s.Gen
 		"namespace": resource.Namespace,
 		"kind":      resource.Kind(),
 		"policy":    plc.Name(),
-	}).Debug("provider.kubernetes.checkVersionedDeployment: keel policy found, checking resource...")
+	}).Debug("provider.kubernetes.checkVersionedDeployment: bow policy found, checking resource...")
 	shouldUpdateDeployment = false
 	for idx, c := range resource.Containers() {
 		containerImageRef, err := image.Parse(c.Image)
@@ -93,6 +93,6 @@ func checkForUpdate(plc policy.Policy, repo *types.Repository, resource *k8s.Gen
 
 func setUpdateTime(resource *k8s.GenericResource) {
 	specAnnotations := resource.GetSpecAnnotations()
-	specAnnotations[types.KeelUpdateTimeAnnotation] = time.Now().String()
+	specAnnotations[types.BowUpdateTimeAnnotation] = time.Now().String()
 	resource.SetSpecAnnotations(specAnnotations)
 }
