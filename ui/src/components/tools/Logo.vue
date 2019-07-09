@@ -9,7 +9,7 @@
 
 <script>
 
-import LogoSvg from '@/assets/bow-logo.svg?inline'
+import LogoSvg from '@/assets/keel-logo.svg?inline'
 
 export default {
   name: 'Logo',
