@@ -34,7 +34,7 @@ type Repo struct {
 	Branch         plumbing.ReferenceName
 }
 
-const committerName = "bow.sh"
+const committerName = "bow"
 const committerEMail = "admin@example.com"
 
 func (r *Repo) init() {
@@ -152,6 +152,8 @@ func (r *Repo) pull() error {
 
 func (r *Repo) getManifests() []manifest.Manifest {
 	r.init()
+	r.fileAccessLock.Lock()
+	defer r.fileAccessLock.Unlock()
 	ref, _ := r.repository.Head()
 	commit, _ := r.repository.CommitObject(ref.Hash())
 	logrus.Debug("repo.getManifests: last commit: ", commit.Message)

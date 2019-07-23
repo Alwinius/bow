@@ -1,11 +1,19 @@
 
 # Bow
 
+Bow detects updated image tags from a Docker registry of images defined in a GitOps deployment repository
+containing Kubernetes Deployments/StatefulSets or Helm templates.
+
+Since it is forked from Keel.sh, it supports many of its features as well.
 
 ## Getting started
 
+Bow needs to have write access to the deployment repository to update it when Bow detects new
+images. You can either set REPO_USERNAME and REPO_PASSWORD environment variables (ideally from a Kubernetes Secret)
+or mount the files `id_rsa` and `known_hosts` into `/root/.ssh/`.
+
 - create secret to use for git auth  
-`kubectl -n bow create secret generic ssh-key-secret --from-file=/home/alwin/.ssh/petclinic-deploy --from-file=/home/alwin/.ssh/petclinic-deploy.pub --from-file=/home/alwin/.ssh/known_hosts`
+`kubectl -n bow create secret generic ssh-key-secret --from-file=/home/alwin/.ssh/id_rsa --from-file=/home/alwin/.ssh/known_hosts`
 - check and adapt `deployment/deployment-norbac.yaml`
     - specifically set REPO_ environment variables
 - apply yaml `kubectl apply -f deployment/deployment-norbac.yaml`
@@ -48,3 +56,7 @@ REPO_CHART_PATH
 
 ## Limitations
 - image name including tag needs to appear somewhere - don't move only the tag to values.yml
+- everything is considered a Helm chart - if you have plain Kubernetes yamls, 
+please create the folder structure of a Helm chart and put your files in the templates folder
+- if the same image is referenced twice with different rules, the replacement process might
+not work as intended
